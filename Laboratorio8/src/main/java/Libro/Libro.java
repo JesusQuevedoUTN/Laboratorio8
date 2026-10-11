@@ -12,18 +12,18 @@ public class Libro{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String ISBN;
     
-    private String Titulo;
-    private String Autor;
+    private String titulo;
+    private String autor;
     private String editorial;
     private int aniopublicacion;
 
     public Libro() {
     }
 
-    public Libro(String ISBN, String Titulo, String Autor, String editorial, int aniopublicacion) {
+    public Libro(String ISBN, String titulo, String autor, String editorial, int aniopublicacion) {
         this.ISBN = ISBN;
-        this.Titulo = Titulo;
-        this.Autor = Autor;
+        this.titulo = titulo;
+        this.autor = autor;
         this.editorial = editorial;
         this.aniopublicacion = aniopublicacion;
     }
@@ -37,19 +37,19 @@ public class Libro{
     }
 
     public String getTitulo() {
-        return Titulo;
+        return titulo;
     }
 
-    public void setTitulo(String Titulo) {
-        this.Titulo = Titulo;
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
     public String getAutor() {
-        return Autor;
+        return autor;
     }
 
-    public void setAutor(String Autor) {
-        this.Autor = Autor;
+    public void setAutor(String autor) {
+        this.autor = autor;
     }
 
     public String getEditorial() {
@@ -70,9 +70,9 @@ public class Libro{
 
     @Override
     public String toString() {
-        return "Libro{" + "ISBN=" + ISBN + ", Titulo=" + Titulo + ", Autor=" + Autor + 
-                ", editorial=" + editorial + ", aniopublicacion=" + aniopublicacion + '}';
+        return "Libro{" + "ISBN=" + ISBN + ", titulo=" + titulo + ", autor=" + autor + ", editorial=" + editorial + ", aniopublicacion=" + aniopublicacion + '}';
     }
+
     
     
     

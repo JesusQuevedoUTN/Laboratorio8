@@ -6,7 +6,9 @@ import org.hibernate.Session;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 
 
@@ -87,7 +89,33 @@ public class ControladorLibro {
     
     }
     public void listarLibros(){
+        Connection connection = null;
+        Statement statment = null;
+        ResultSet resultSet = null;
         
+        String dbUrl = "jdbc:mysql://localhost:3306/tu_base";
+        String usuario = "root";
+        String contrasenia = "contrasenia";
+        
+        try{
+            connection = DriverManager.getConnection(dbUrl,usuario,contrasenia);//Remplazar DriverManager con la clase de conexion
+            
+            statment = connection.createStatement();
+            
+            String sql = "SELECT ISBN, titulo, autor, editorial, anio_publicacion FROM LIBRO";
+            
+            resultSet = statment.executeQuery(sql);
+            
+            while(resultSet.next()){
+            String isbn = resultSet.getString("isbn");
+            String titulo = resultSet.getString("titulo");
+            String autor = resultSet.getString("autor");
+            String editorial = resultSet.getString("editorial");
+            int anio = resultSet.getInt("anio");
+            }
+        }catch (SQLException e) {
+        System.out.println("Error al agregar el libro: " + e.getMessage());
+    }   
     }
     
     public void buscarLibro(String ISBN){
