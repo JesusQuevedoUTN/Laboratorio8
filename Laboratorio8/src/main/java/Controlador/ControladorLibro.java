@@ -1,5 +1,6 @@
 package Controlador;
 
+import Libro.Libro;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import org.hibernate.Session;
@@ -22,6 +23,8 @@ public class ControladorLibro {
     public void menuLibro(){
         Scanner teclado = new Scanner(System.in);
         int menu = -1;
+        Libro libro;
+        String ISBN = null;
         
         do{
             try{
@@ -42,16 +45,23 @@ public class ControladorLibro {
                  switch (menu){
                      case 1 -> agregarLibro();
                      case 2 -> listarLibros();
-                     case 3 -> buscarLibro("123");
-                     case 4 -> modificarLibro("123");
-                     case 5 -> eliminarLibro("123");
+                     case 3 ->{ System.out.println("Ingrese el ISBN de libro:");
+                               ISBN = teclado.nextLine();
+                               libro = buscarLibro(ISBN);
+                               System.out.println(libro);}
+                     case 4 -> {System.out.println("Ingrese el ISBN de libro:");
+                               ISBN = teclado.nextLine();
+                         modificarLibro(ISBN);}
+                     case 5 -> {System.out.println("Ingrese el ISBN de libro:");
+                               ISBN = teclado.nextLine();
+                         eliminarLibro(ISBN);}
                  }
                 
             }catch (InputMismatchException e) {
                 System.out.println("Error: Tipo de dato incorrecto (Ingresó letras o formato numérico inválido).");
             }
             teclado.nextLine();
-        } while(menu != 7);
+        } while(menu != 0);
     }
     
     public void agregarLibro(){
@@ -118,12 +128,39 @@ public class ControladorLibro {
     }   
     }
     
-    public void buscarLibro(String ISBN){
-        
+    public Libro buscarLibro(String ISBN){
+        Libro libro;
+        libro = session.find(Libro.class, ISBN);
+        if(libro != null){
+          return libro;
+        }else{
+            System.out.println();
+            System.out.println("Libro no encontrado");
+            return null;
+        }
     }
     
     public void modificarLibro(String ISBN){
-        
+        Scanner teclado = new Scanner(System.in);
+        Libro libro;
+        libro = session.find(Libro.class, ISBN);
+        if(ISBN != null){
+        System.out.println("Ingrese el nuevo titulo: ");
+        libro.setTitulo(teclado.nextLine());
+        System.out.println("Ingrese el nuevo autor: ");
+        libro.setAutor(teclado.nextLine());
+        System.out.println("Ingrese la nuevo editorial: ");
+        libro.setEditorial(teclado.nextLine());
+        System.out.println("Ingrese el nuevo anio de publicacion: ");
+        libro.setAniopublicacion(Integer.parseInt(teclado.nextLine()));
+        session.beginTransaction();
+        session.merge(libro);
+        session.getTransaction().commit();
+        System.out.println("Producto actualizado..");
+        System.out.println();
+        }else{
+          System.out.println("El libro no se encontro");
+        }
     }
     
     public void eliminarLibro(String ISBN){
