@@ -144,7 +144,7 @@ public class ControladorLibro {
         Scanner teclado = new Scanner(System.in);
         Libro libro;
         libro = session.find(Libro.class, ISBN);
-        if(ISBN != null){
+        if(libro != null){
         System.out.println("Ingrese el nuevo titulo: ");
         libro.setTitulo(teclado.nextLine());
         System.out.println("Ingrese el nuevo autor: ");
@@ -159,12 +159,23 @@ public class ControladorLibro {
         System.out.println("Producto actualizado..");
         System.out.println();
         }else{
-          System.out.println("El libro no se encontro");
+          System.out.println("No se pudo encontrar el libro");
         }
     }
     
     public void eliminarLibro(String ISBN){
-        
+        Scanner teclado = new Scanner(System.in);
+        Libro libro;
+        libro = session.find(Libro.class, ISBN);
+        if(libro != null){
+            System.out.println(libro);
+            session.beginTransaction();
+            session.remove(libro);
+            session.getTransaction().commit();
+            System.out.println("Libro eliminado...");
+        }else{
+            System.out.println("No se pudo encontrar el libro");
+        }
     }
     
 }
