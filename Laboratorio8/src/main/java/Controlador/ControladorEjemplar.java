@@ -1,6 +1,7 @@
 package Controlador;
 import Libro.Ejemplar;
 import Libro.Estado;
+import Libro.Libro;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -60,13 +61,18 @@ public class ControladorEjemplar {
         Scanner teclado = new Scanner(System.in);
         String isbn;
         int nro;
+        Libro libro;
         
         System.out.println("Ingrese el ISBN del libro: ");
         isbn = teclado.nextLine();
-        System.out.println("Ingrese el dumero de ejemplar: ");
-        nro = Integer.parseInt(teclado.nextLine());
         
-        String sql = "INSERT INTO EJEMPLAR (ISBN, nro_ejemplar, estado) VALUES (?, ?, ?,)";
+        libro = session.find(Libro.class, isbn);
+        
+        if(libro != null){
+            System.out.println("Ingrese el dumero de ejemplar: ");
+            nro = Integer.parseInt(teclado.nextLine());
+        
+            String sql = "INSERT INTO EJEMPLAR (ISBN, nro_ejemplar, estado) VALUES (?, ?, ?,)";
         
         try (Connection con = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/tu_base", "root", "tu_contraseña"); //Cambiar tu_base por la base de datos y la contraseña, y cambiar DriverManager con la clase de conexcion
@@ -81,7 +87,9 @@ public class ControladorEjemplar {
         }catch (SQLException e) {
         System.out.println("Error al agregar el ejemplar: " + e.getMessage());
     }
-        
+        }else{
+            System.out.println("El ISBN no se conecta a ningun libro");
+        }
     }
     
     public void listarEjemplares(){
