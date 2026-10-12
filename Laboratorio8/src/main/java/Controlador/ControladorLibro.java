@@ -78,7 +78,7 @@ public class ControladorLibro {
         System.out.println("Ingrese anio de publicacion: ");
         int anio = Integer.parseInt(teclado.nextLine());
         
-        String sql = "INSERT INTO LIBRO (isbn, titulo, autor, editorial, anio) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO LIBRO (ISBN, titulo, autor, editorial, anio_publicacion) VALUES (?, ?, ?, ?, ?)";
         
          try (Connection con = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/tu_base", "root", "tu_contraseña"); //Cambiar tu_base por la base de datos y la contraseña
@@ -103,9 +103,9 @@ public class ControladorLibro {
         Statement statment = null;
         ResultSet resultSet = null;
         
-        String dbUrl = "jdbc:mysql://localhost:3306/tu_base";
+        String dbUrl = "jdbc:mysql://localhost:3306/tu_base";//cambiar el nombre de la base
         String usuario = "root";
-        String contrasenia = "contrasenia";
+        String contrasenia = "contrasenia";//cambiar contraseña
         
         try{
             connection = DriverManager.getConnection(dbUrl,usuario,contrasenia);//Remplazar DriverManager con la clase de conexion
@@ -117,7 +117,7 @@ public class ControladorLibro {
             resultSet = statment.executeQuery(sql);
             
             while(resultSet.next()){
-            String isbn = resultSet.getString("isbn");
+            String isbn = resultSet.getString("ISBN");
             String titulo = resultSet.getString("titulo");
             String autor = resultSet.getString("autor");
             String editorial = resultSet.getString("editorial");
@@ -156,7 +156,7 @@ public class ControladorLibro {
         session.beginTransaction();
         session.merge(libro);
         session.getTransaction().commit();
-        System.out.println("Producto actualizado..");
+        System.out.println("Libro actualizado..");
         System.out.println();
         }else{
           System.out.println("No se pudo encontrar el libro");
