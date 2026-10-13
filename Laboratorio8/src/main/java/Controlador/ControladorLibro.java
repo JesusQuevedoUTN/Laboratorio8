@@ -163,7 +163,7 @@ public class ControladorLibro {
        Transaction trx = session.beginTransaction();
        libro = session.createNativeQuery("SELECT * FROM LIBRO WHERE ISBN =:isbn", Libro.class).setParameter("isbn", isbn).getSingleResult();
         }catch(Exception e){
-            System.out.println("Hubo un error al recuperar el pedido");
+            System.out.println("Hubo un error al recuperar el libro");
         }
        return libro;
     }

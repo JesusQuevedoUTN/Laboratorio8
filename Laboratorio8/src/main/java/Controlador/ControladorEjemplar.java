@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class ControladorEjemplar {
     private final Session session;
@@ -126,12 +127,15 @@ public class ControladorEjemplar {
     }   
     }
     
-    public void modificarEstado(String ISBN, int nro){
+    public void modificarEstado(String isbn, int nro){
         Scanner teclado = new Scanner(System.in);
         Ejemplar ejemplar;
         int res = -1;
         
-        ejemplar = session.find(Ejemplar.class, ISBN);
+        try{
+        Transaction trx = session.beginTransaction();
+       //ejemplar = session.find(Ejemplar.class, ISBN);
+       ejemplar = session.createNativeQuery("SELECT * FROM productos WHERE ISBN =:isbn && nro_ejemplar =: nro", Ejemplar.class).setParameter("id", isbn).setParameter("nro", nro).getSingleResult();
          if(ejemplar != null){
              while(res < 1 || res > 2){
              System.out.println("Ingrese el estado(1:Disponible|2:Prestado)");
@@ -144,15 +148,16 @@ public class ControladorEjemplar {
                  System.out.println("Numero invalido, ingrese de nuevo");
              }
              }
-        session.beginTransaction();
+         }else{
+            System.out.println();
+            System.out.println("Ejemplar no encontrado");
+        }
         session.merge(ejemplar);
         session.getTransaction().commit();
         System.out.println("Ejemplar actualizado..");
         System.out.println();
-        }else{
-            System.out.println();
-            System.out.println("Ejemplar no encontrado");
+             }catch(Exception e){
+                 System.out.println("Hubo un problema al actualizar el ejemplar");
+             }
         }
     }
-    
-}
