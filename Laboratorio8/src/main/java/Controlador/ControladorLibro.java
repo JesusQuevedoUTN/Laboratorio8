@@ -66,17 +66,34 @@ public class ControladorLibro {
     
     public void agregarLibro(){
         Scanner teclado = new Scanner(System.in);
+        int anio = 0;
         
         System.out.println("Ingres ISBN: ");
         String isbn = teclado.nextLine();
+        if (isbn == null || isbn.isEmpty()) {
+            throw new IllegalArgumentException("El ISBN no puede estar vacío.");
+        }
         System.out.println("Ingrese titulo: ");
         String titulo = teclado.nextLine();
+        if (titulo == null || titulo.isEmpty()) {
+            throw new IllegalArgumentException("El titulo no puede estar vacío.");
+        }
         System.out.println("Ingrese autor: ");
         String autor = teclado.nextLine();
+        if (autor == null || autor.isEmpty()) {
+            throw new IllegalArgumentException("El autor no puede estar vacío.");
+        }
         System.out.println("Ingrese editorial: ");
         String editorial = teclado.nextLine();
+        if (editorial == null || editorial.isEmpty()) {
+            throw new IllegalArgumentException("La editorial no puede estar vacío.");
+        }
+        try{
         System.out.println("Ingrese anio de publicacion: ");
-        int anio = Integer.parseInt(teclado.nextLine());
+        anio = Integer.parseInt(teclado.nextLine());
+        }catch(NumberFormatException e){
+         System.out.println("Error: el año debe ser un número entero. Intente de nuevo.");
+        }
         
         String sql = "INSERT INTO LIBRO (ISBN, titulo, autor, editorial, anio_publicacion) VALUES (?, ?, ?, ?, ?)";
         
@@ -121,7 +138,9 @@ public class ControladorLibro {
             String titulo = resultSet.getString("titulo");
             String autor = resultSet.getString("autor");
             String editorial = resultSet.getString("editorial");
-            int anio = resultSet.getInt("anio");
+            int anio = resultSet.getInt("anio_publicacion");
+            
+            System.out.println("ISBN: " + isbn + " Titulo: " + titulo + " Autor: " + autor + " Editorial: " + editorial + " Anio de salida: " + anio);
             }
         }catch (SQLException e) {
         System.out.println("Error al agregar el libro: " + e.getMessage());

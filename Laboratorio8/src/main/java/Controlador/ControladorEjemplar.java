@@ -60,7 +60,7 @@ public class ControladorEjemplar {
     public void agregarEjemplar(){
         Scanner teclado = new Scanner(System.in);
         String isbn;
-        int nro;
+        int nro = 0;
         Libro libro;
         
         System.out.println("Ingrese el ISBN del libro: ");
@@ -69,8 +69,12 @@ public class ControladorEjemplar {
         libro = session.find(Libro.class, isbn);
         
         if(libro != null){
-            System.out.println("Ingrese el dumero de ejemplar: ");
+            try{
+            System.out.println("Ingrese el numero de ejemplar: ");
             nro = Integer.parseInt(teclado.nextLine());
+            }catch(NumberFormatException e){
+                System.out.println("El numero tiene que ser entero. Intente de nuevo");
+            }
         
             String sql = "INSERT INTO EJEMPLAR (ISBN, nro_ejemplar, estado) VALUES (?, ?, ?,)";
         
@@ -114,6 +118,8 @@ public class ControladorEjemplar {
             String isbn = resultSet.getString("ISBN");
             int nro_ejemplar = resultSet.getInt("nro_ejemplar");
             String estado = resultSet.getString("estado");
+            
+            System.out.println("ISBN: " + isbn + " Numero: " + nro_ejemplar + " Estado: " + estado);
             }
         }catch (SQLException e) {
         System.out.println("Error al agregar el libro: " + e.getMessage());
@@ -123,16 +129,20 @@ public class ControladorEjemplar {
     public void modificarEstado(String ISBN, int nro){
         Scanner teclado = new Scanner(System.in);
         Ejemplar ejemplar;
-        int res = 1;
+        int res = -1;
         
         ejemplar = session.find(Ejemplar.class, ISBN);
          if(ejemplar != null){
+             while(res < 1 || res > 2){
              System.out.println("Ingrese el estado(1:Disponible|2:Prestado)");
              res = Integer.parseInt(teclado.nextLine());
              if(res == 1){
                  ejemplar.setEstado(Estado.Disponible);
-             }else{
+             }else if(res == 2){
                  ejemplar.setEstado(Estado.Prestado);
+             }else{
+                 System.out.println("Numero invalido, ingrese de nuevo");
+             }
              }
         session.beginTransaction();
         session.merge(ejemplar);
