@@ -10,7 +10,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Scanner;
+import org.hibernate.Transaction;
 
 
 public class ControladorLibro {
@@ -147,16 +149,23 @@ public class ControladorLibro {
     }   
     }
     
-    public Libro buscarLibro(String ISBN){
-        Libro libro;
-        libro = session.find(Libro.class, ISBN);
+    public Libro buscarLibro(String isbn){
+        Libro libro = null;
+        /*libro = session.find(Libro.class, isbn);
         if(libro != null){
           return libro;
         }else{
             System.out.println();
             System.out.println("Libro no encontrado");
             return null;
+        }*/
+        try{
+       Transaction trx = session.beginTransaction();
+       libro = session.createNativeQuery("SELECT * FROM LIBRO WHERE ISBN =:isbn", Libro.class).setParameter("isbn", isbn).getSingleResult();
+        }catch(Exception e){
+            System.out.println("Hubo un error al recuperar el pedido");
         }
+       return libro;
     }
     
     public void modificarLibro(String ISBN){
