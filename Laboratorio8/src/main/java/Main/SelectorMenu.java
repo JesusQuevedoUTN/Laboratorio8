@@ -28,13 +28,13 @@ public class SelectorMenu {
 
                 switch (menu) {
                     case 1 ->
-                        ;
+                        System.out.println("null");
                     case 2 ->
-                        ;
+                        System.out.println("null");
                     case 3 ->
-                        ;
+                        System.out.println("null");
                     case 4 ->
-                        ;
+                        System.out.println("null");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Error: Tipo de dato incorrecto (Ingresó letras o formato numérico inválido).");
@@ -42,7 +42,5 @@ public class SelectorMenu {
             teclado.nextLine(); // Limpiamos el buffer del Scanner para evitar bucle infinito
         } while (menu < 0 || menu > 4);
     }
-
-}
 
 }
