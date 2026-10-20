@@ -230,16 +230,20 @@ public class ControladorLibro {
     
     public void eliminarLibro(String ISBN){
         Scanner teclado = new Scanner(System.in);
-        Libro libro;
-        libro = session.find(Libro.class, ISBN);
-        if(libro != null){
-            System.out.println(libro);
-            session.beginTransaction();
-            session.remove(libro);
-            session.getTransaction().commit();
-            System.out.println("Libro eliminado...");
-        }else{
-            System.out.println("No se pudo encontrar el libro");
+        String sql = "DELETE FROM LIBRO WHERE ISBN = ?";
+        try (Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/tu_base", "root", "Casa1407SQL");
+         PreparedStatement ps = con.prepareStatement(sql)){
+            ps.setString(1, ISBN);  
+            int filas = ps.executeUpdate();
+        if (filas > 0) {
+            System.out.println("Libro eliminado correctamente.");
+        } else {
+            System.out.println("No existe un libro con ese ISBN.");
+        }
+            
+        }catch (SQLException e) {
+            System.out.println("Error al eliminar libro: " + e.getMessage());
         }
     }
     
