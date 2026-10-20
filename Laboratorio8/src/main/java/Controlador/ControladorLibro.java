@@ -49,8 +49,8 @@ public class ControladorLibro {
                      case 2 -> listarLibros();
                      case 3 ->{ System.out.println("Ingrese el ISBN de libro:");
                                ISBN = teclado.nextLine();
-                               libro = buscarLibro(ISBN);
-                               System.out.println(libro);}
+                               buscarLibro(ISBN);
+                               }
                      case 4 -> {System.out.println("Ingrese el ISBN de libro:");
                                ISBN = teclado.nextLine();
                          modificarLibro(ISBN);}
@@ -149,23 +149,36 @@ public class ControladorLibro {
     }   
     }
     
-    public Libro buscarLibro(String isbn){
-        Libro libro = null;
-        /*libro = session.find(Libro.class, isbn);
-        if(libro != null){
-          return libro;
-        }else{
-            System.out.println();
-            System.out.println("Libro no encontrado");
-            return null;
-        }*/
-        try{
-       Transaction trx = session.beginTransaction();
-       libro = session.createNativeQuery("SELECT * FROM LIBRO WHERE ISBN =:isbn", Libro.class).setParameter("isbn", isbn).getSingleResult();
-        }catch(Exception e){
-            System.out.println("Hubo un error al recuperar el libro");
+    public void buscarLibro(String isbn){
+        String sql = "SELECT * FROM LIBRO WHERE ISBN = ?";
+        
+        try(Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/tu_base", "root", "tu_contraseña");
+                PreparedStatement ps = con.prepareStatement(sql)){
+            ps.setString(1, isbn);
+            
+            try(ResultSet rs = ps.executeQuery()){
+             if(rs.next()){
+            String titulo = rs.getString("titulo");
+            String autor = rs.getString("autor");
+            String editorial = rs.getString("editorial");
+            int anio = rs.getInt("anio_publicacion");
+            
+                 System.out.println("\n--- ¡Socio Encontrado! ---");
+                    System.out.println("ISBN: " + isbn);
+                    System.out.println("Titulo: " + titulo);
+                    System.out.println("Autor: " + autor);
+                    System.out.println("Editorial: " + editorial);
+                    System.out.println("Anio de oublicacion: " + anio);
+                    System.out.println("--------------------------\n");
+                }else{
+                 System.out.println("Libro no encontrado");
+             }
+            }
+            
+        }catch (SQLException e) {
+            System.out.println("Error al buscar libro: " + e.getMessage());
         }
-       return libro;
     }
     
     public void modificarLibro(String ISBN){
