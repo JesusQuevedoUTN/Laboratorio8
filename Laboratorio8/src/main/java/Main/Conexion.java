@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class Conexion {
 
     private static final String DRIVER = "org.mariadb.jdbc.Driver";
-    private static final String URL = "jdbc:mariadb://localhost:3306/biblioteca_db?useSSL=false&allowPublicKeyRetrieval=true";
+    private static final String URL = "jdbc:mariadb://localhost:3306/biblioteca_db";
     private static final String USUARIO = "root";
     private static final String PASSWORD = ""; 
 
