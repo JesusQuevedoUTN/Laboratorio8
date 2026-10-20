@@ -49,7 +49,7 @@ public class ControladorLibro {
                      case 2 -> listarLibros();
                      case 3 ->{ System.out.println("Ingrese el ISBN de libro:");
                                ISBN = teclado.nextLine();
-                               buscarLibro(ISBN);
+                               buscarLibroPorISBN(ISBN);
                                }
                      case 4 -> {System.out.println("Ingrese el ISBN de libro:");
                                ISBN = teclado.nextLine();
@@ -100,7 +100,7 @@ public class ControladorLibro {
         String sql = "INSERT INTO LIBRO (ISBN, titulo, autor, editorial, anio_publicacion) VALUES (?, ?, ?, ?, ?)";
         
          try (Connection con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/tu_base", "root", "tu_contraseña"); //Cambiar tu_base por la base de datos y la contraseña
+                "jdbc:mysql://localhost:3306/tu_base", "root", "Casa1407SQL"); //Cambiar tu_base por la base de datos y la contraseña
          PreparedStatement ps = con.prepareStatement(sql)) {
 
         ps.setString(1, isbn);
@@ -124,7 +124,7 @@ public class ControladorLibro {
         
         String dbUrl = "jdbc:mysql://localhost:3306/tu_base";//cambiar el nombre de la base
         String usuario = "root";
-        String contrasenia = "contrasenia";//cambiar contraseña
+        String contrasenia = "Casa1407SQL";//cambiar contraseña
         
         try{
             connection = DriverManager.getConnection(dbUrl,usuario,contrasenia);//Remplazar DriverManager con la clase de conexion
@@ -149,11 +149,11 @@ public class ControladorLibro {
     }   
     }
     
-    public void buscarLibro(String isbn){
-        String sql = "SELECT * FROM LIBRO WHERE ISBN = ?";
+    public void buscarLibroPorISBN(String isbn){
+       String sql = "SELECT * FROM LIBRO WHERE ISBN = ?";
         
         try(Connection con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/tu_base", "root", "tu_contraseña");
+                "jdbc:mysql://localhost:3306/tu_base", "root", "Casa1407SQL");
                 PreparedStatement ps = con.prepareStatement(sql)){
             ps.setString(1, isbn);
             
@@ -182,25 +182,49 @@ public class ControladorLibro {
     }
     
     public void modificarLibro(String ISBN){
-        Scanner teclado = new Scanner(System.in);
-        Libro libro;
-        libro = session.find(Libro.class, ISBN);
-        if(libro != null){
-        System.out.println("Ingrese el nuevo titulo: ");
-        libro.setTitulo(teclado.nextLine());
-        System.out.println("Ingrese el nuevo autor: ");
-        libro.setAutor(teclado.nextLine());
-        System.out.println("Ingrese la nuevo editorial: ");
-        libro.setEditorial(teclado.nextLine());
-        System.out.println("Ingrese el nuevo anio de publicacion: ");
-        libro.setAniopublicacion(Integer.parseInt(teclado.nextLine()));
-        session.beginTransaction();
-        session.merge(libro);
-        session.getTransaction().commit();
-        System.out.println("Libro actualizado..");
-        System.out.println();
+      Scanner teclado = new Scanner(System.in);
+      int anio = 0;
+      System.out.println("Ingrese titulo: ");
+        String titulo = teclado.nextLine();
+        if (titulo == null || titulo.isEmpty()) {
+            throw new IllegalArgumentException("El titulo no puede estar vacío.");
+        }
+        System.out.println("Ingrese autor: ");
+        String autor = teclado.nextLine();
+        if (autor == null || autor.isEmpty()) {
+            throw new IllegalArgumentException("El autor no puede estar vacío.");
+        }
+        System.out.println("Ingrese editorial: ");
+        String editorial = teclado.nextLine();
+        if (editorial == null || editorial.isEmpty()) {
+            throw new IllegalArgumentException("La editorial no puede estar vacío.");
+        }
+        try{
+        System.out.println("Ingrese anio de publicacion: ");
+         anio = Integer.parseInt(teclado.nextLine());
+        }catch(NumberFormatException e){
+         System.out.println("Error: el año debe ser un número entero. Intente de nuevo.");
+        }
+      String sql = "UPDATE Libro SET titulo = ?, autor = ?, editorial = ?, anio_publicacion = ? WHERE isbn = ?";
+      
+      try (Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/tu_base", "root", "Casa1407SQL");
+         PreparedStatement ps = con.prepareStatement(sql)){
+        ps.setString(1, titulo);
+        ps.setString(2, autor);
+        ps.setString(3, editorial);
+        ps.setInt(4, anio);
+        ps.setString(5, ISBN);
+        
+        int filas = ps.executeUpdate();
+        
+        if(filas > 0){
+            System.out.println("Libro modificado correctamente");
         }else{
-          System.out.println("No se pudo encontrar el libro");
+            System.out.println("No existe uh libro con ese ISBN");
+        }
+      }catch (SQLException e) {
+            System.out.println("Error al modificar libro: " + e.getMessage());
         }
     }
     
