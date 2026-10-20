@@ -7,19 +7,16 @@ import java.sql.SQLException;
 public class Conexion {
 
     private static final String DRIVER = "org.mariadb.jdbc.Driver";
-    private static final String URL = "jdbc:mariadb://localhost:3306/Biblioteca_DB";
+    private static final String URL = "jdbc:mariadb://localhost:3306/biblioteca_db?useSSL=false&allowPublicKeyRetrieval=true";
     private static final String USUARIO = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = ""; 
 
     public static Connection getConexion() {
         Connection conexion = null;
         try {
-
             Class.forName(DRIVER);
             conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
-
-            System.out.println("CONECTADO");
-
+            System.out.println("Conectado");
         } catch (ClassNotFoundException e) {
             System.out.println("Error: No se encontró el driver JDBC de MariaDB -> " + e.getMessage());
         } catch (SQLException e) {
