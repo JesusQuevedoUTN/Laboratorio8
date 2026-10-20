@@ -10,15 +10,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 public class ControladorEjemplar {
-    private final Session session;
 
-    public ControladorEjemplar(Session session) {
-        this.session = session;
-    }
     
     public void menu(){
         Scanner teclado = new Scanner(System.in);
@@ -59,42 +53,7 @@ public class ControladorEjemplar {
     }
     
     public void agregarEjemplar(){
-        Scanner teclado = new Scanner(System.in);
-        String isbn;
-        int nro = 0;
-        Libro libro;
         
-        System.out.println("Ingrese el ISBN del libro: ");
-        isbn = teclado.nextLine();
-        
-        libro = session.find(Libro.class, isbn);
-        
-        if(libro != null){
-            try{
-            System.out.println("Ingrese el numero de ejemplar: ");
-            nro = Integer.parseInt(teclado.nextLine());
-            }catch(NumberFormatException e){
-                System.out.println("El numero tiene que ser entero. Intente de nuevo");
-            }
-        
-            String sql = "INSERT INTO EJEMPLAR (ISBN, nro_ejemplar, estado) VALUES (?, ?, ?,)";
-        
-        try (Connection con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/tu_base", "root", "tu_contraseña"); //Cambiar tu_base por la base de datos y la contraseña, y cambiar DriverManager con la clase de conexcion
-         PreparedStatement ps = con.prepareStatement(sql)){
-            ps.setString(1, isbn);
-            ps.setInt(2, nro);
-            ps.setString(3, "Disponible");
-            
-            int filas = ps.executeUpdate();
-            System.out.println("Ejemplar agregado. Filas insertadas: " + filas);
-            
-        }catch (SQLException e) {
-        System.out.println("Error al agregar el ejemplar: " + e.getMessage());
-    }
-        }else{
-            System.out.println("El ISBN no se conecta a ningun libro");
-        }
     }
     
     public void listarEjemplares(){
@@ -129,35 +88,7 @@ public class ControladorEjemplar {
     
     public void modificarEstado(String isbn, int nro){
         Scanner teclado = new Scanner(System.in);
-        Ejemplar ejemplar;
-        int res = -1;
         
-        try{
-        Transaction trx = session.beginTransaction();
-       //ejemplar = session.find(Ejemplar.class, ISBN);
-       ejemplar = session.createNativeQuery("SELECT * FROM productos WHERE ISBN =:isbn && nro_ejemplar =: nro", Ejemplar.class).setParameter("id", isbn).setParameter("nro", nro).getSingleResult();
-         if(ejemplar != null){
-             while(res < 1 || res > 2){
-             System.out.println("Ingrese el estado(1:Disponible|2:Prestado)");
-             res = Integer.parseInt(teclado.nextLine());
-             if(res == 1){
-                 ejemplar.setEstado(Estado.Disponible);
-             }else if(res == 2){
-                 ejemplar.setEstado(Estado.Prestado);
-             }else{
-                 System.out.println("Numero invalido, ingrese de nuevo");
-             }
-             }
-         }else{
-            System.out.println();
-            System.out.println("Ejemplar no encontrado");
-        }
-        session.merge(ejemplar);
-        session.getTransaction().commit();
-        System.out.println("Ejemplar actualizado..");
-        System.out.println();
-             }catch(Exception e){
-                 System.out.println("Hubo un problema al actualizar el ejemplar");
-             }
-        }
     }
+    
+}

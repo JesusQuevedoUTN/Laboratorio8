@@ -1,15 +1,8 @@
 package Libro;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 
 public class Ejemplar {
     
-    @Id
-    @Column(name = "ISBN")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String ISBN;
     
     private int nro_ejemplar;

@@ -3,7 +3,6 @@ package Controlador;
 import Libro.Libro;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import org.hibernate.Session;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,15 +11,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Scanner;
-import org.hibernate.Transaction;
+
 
 
 public class ControladorLibro {
-    private final Session session;
 
-    public ControladorLibro(Session session) {
-        this.session = session;
-    }
     
     public void menuLibro(){
         Scanner teclado = new Scanner(System.in);
