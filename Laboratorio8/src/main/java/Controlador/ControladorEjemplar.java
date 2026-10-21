@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import Main.Conexion;
 
 public class ControladorEjemplar {
 
@@ -40,9 +41,7 @@ public class ControladorEjemplar {
                      case 2 -> listarEjemplares();
                      case 3 -> {System.out.println("Ingrese el ISBN de libro:");
                                 ISBN = teclado.nextLine();
-                                System.out.println("Ingrese el nro de ejmplar");
-                                nro = Integer.parseInt(teclado.nextLine());
-                                modificarEstado(ISBN, nro);}
+                                modificarEstado(ISBN);}
                  }
                 
             }catch (InputMismatchException e) {
@@ -53,7 +52,36 @@ public class ControladorEjemplar {
     }
     
     public void agregarEjemplar(){
+        Scanner teclado = new Scanner(System.in);
+        int nro = 0;
         
+        System.out.println("Ingres ISBN: ");
+        String isbn = teclado.nextLine();
+        if (isbn == null || isbn.isEmpty()) {
+            throw new IllegalArgumentException("El ISBN no puede estar vacío.");
+        }
+       
+    boolean valido = false;
+    while (!valido) {
+        try {
+            System.out.println("Ingrese numero de ejemplar: ");
+            nro = Integer.parseInt(teclado.nextLine());
+            valido = true;
+        } catch (NumberFormatException e) {
+            System.out.println("Error: el numero de ejemplar debe ser un entero. Intente de nuevo.");
+        }
+    }
+    
+    String sql = "INSERT INTO ejemplar (ISBN, nro_ejemplar) VALUES (?, ?)";
+    
+         try (Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql)){
+             
+             ps.setString(1, isbn);
+             ps.setInt(2, nro);
+             
+         }catch (SQLException e) {
+            System.out.println("Error al agregar ejemplar: " + e.getMessage());
+        }
     }
     
     public void listarEjemplares(){
@@ -86,9 +114,53 @@ public class ControladorEjemplar {
     }   
     }
     
-    public void modificarEstado(String isbn, int nro){
+    public void modificarEstado(String isbn){
         Scanner teclado = new Scanner(System.in);
+        int nro = 0;
+        int estado = 0;
         
+    boolean valido = false;
+    while (!valido) {
+        try {
+            System.out.println("Ingrese numero de ejemplar: ");
+            nro = Integer.parseInt(teclado.nextLine());
+            valido = true;
+        } catch (NumberFormatException e) {
+            System.out.println("Error: el numero de ejemplar debe ser un entero. Intente de nuevo.");
+        }
+    }
+    System.out.println("Que estado quiere darle al ejemplar[1:Disponible|2:Prestado]: ");
+    while(estado < 1 || estado > 2){
+        estado = Integer.parseInt(teclado.nextLine());
+        if(estado < 1 || estado > 2){
+            System.out.println("Numero invalido ingrese otra vez: ");
+        }
+    }
+        
+       String sql = "UPDATE EJEMPLAR SET estado = ?" + "WHERE ISBN = ? AND nro_ejemplar = ?";
+    
+       try (Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql)){
+            
+           ps.setString(2, isbn);
+           ps.setInt(3, nro);
+           if(estado == 1){
+               ps.setString(1, "Disponible");
+           }else{
+               ps.setString(1, "Prestado");
+           }
+           
+           int filas = ps.executeUpdate();
+
+        if (filas > 0) {
+            System.out.println("Estado actualizado " );
+        } else {
+            System.out.println("No se pudo cambiar: el ejemplar no existe o no estaba ");
+        }
+ 
+    }catch (SQLException e) {
+            System.out.println("Error al agregar ejemplar: " + e.getMessage());
+        }
+    
     }
     
 }
