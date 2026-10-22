@@ -84,28 +84,14 @@ public class ControladorEjemplar {
         }
     }
     
-    public void listarEjemplares(){
-        Connection connection = null;
-        Statement statment = null;
-        ResultSet resultSet = null;
-        
-        String dbUrl = "jdbc:mysql://localhost:3306/tu_base";//cambiar el nombre de la base
-        String usuario = "root";
-        String contrasenia = "contrasenia";
-        
-        try{
-            connection = DriverManager.getConnection(dbUrl,usuario,contrasenia);//Remplazar DriverManager con la clase de conexion
-            
-            statment = connection.createStatement();
-            
-            String sql = "SELECT ISBN, nro_ejemplar, estado FROM EJEMPLAR";
-            
-            resultSet = statment.executeQuery(sql);
-            
-            while(resultSet.next()){
-            String isbn = resultSet.getString("ISBN");
-            int nro_ejemplar = resultSet.getInt("nro_ejemplar");
-            String estado = resultSet.getString("estado");
+    public void listarEjemplares(){   
+         String sql = "SELECT ISBN, nro_ejemplar, estado FROM EJEMPLAR";
+        try(Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()){
+
+            while(rs.next()){
+            String isbn = rs.getString("ISBN");
+            int nro_ejemplar = rs.getInt("nro_ejemplar");
+            String estado = rs.getString("estado");
             
             System.out.println("ISBN: " + isbn + " Numero: " + nro_ejemplar + " Estado: " + estado);
             }
