@@ -183,7 +183,7 @@ public class ControladorLibro {
         }catch(NumberFormatException e){
          System.out.println("Error: el año debe ser un número entero. Intente de nuevo.");
         }
-      String sql = "UPDATE Libro SET titulo = ?, autor = ?, editorial = ?, anio_publicacion = ? WHERE isbn = ?";
+      String sql = "UPDATE LIBRO SET titulo = ?, autor = ?, editorial = ?, anio_publicacion = ? WHERE ISBN = ?";
       
       try (Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql)){
         ps.setString(1, titulo);
