@@ -64,6 +64,7 @@ public class ControladorLibro {
     public void agregarLibro(){
         Scanner teclado = new Scanner(System.in);
         int anio = 0;
+        boolean valido = false;
         
         System.out.println("Ingres ISBN: ");
         String isbn = teclado.nextLine();
@@ -85,11 +86,14 @@ public class ControladorLibro {
         if (editorial == null || editorial.isEmpty()) {
             throw new IllegalArgumentException("La editorial no puede estar vacío.");
         }
+        while(!valido){
         try{
         System.out.println("Ingrese anio de publicacion: ");
         anio = Integer.parseInt(teclado.nextLine());
+        valido = true;
         }catch(NumberFormatException e){
          System.out.println("Error: el año debe ser un número entero. Intente de nuevo.");
+        }
         }
         
         String sql = "INSERT INTO LIBRO (ISBN, titulo, autor, editorial, anio_publicacion) VALUES (?, ?, ?, ?, ?)";

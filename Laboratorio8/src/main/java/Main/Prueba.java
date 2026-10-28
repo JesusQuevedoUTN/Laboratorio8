@@ -1,11 +1,19 @@
 package Main;
 
+import Controlador.ControladorLibro;
 import Socios.GestorSocio;
 
 public class Prueba {
     public static void main(String[] args) {
         // Creamos una instancia de nuestro gestor
         GestorSocio gestor = new GestorSocio();
+        ControladorLibro lib = new ControladorLibro();
+        
+        System.out.println("Ingresar Lib: ");
+        lib.agregarLibro();
+        
+        System.out.println("Lista libros: ");
+        lib.listarLibros();
         
         // 0. Opcional pero recomendado: Probamos listar todos los socios de la tabla
         System.out.println("=== 1. LISTANDO TODOS LOS SOCIOS ===");
