@@ -1,5 +1,6 @@
 package Main;
 
+import Controlador.ControladorEjemplar;
 import Controlador.ControladorLibro;
 import Controlador.GestorPrestamos;
 import Socios.GestorSocio;
@@ -10,11 +11,16 @@ public class Prueba {
         GestorSocio gestor = new GestorSocio();
         ControladorLibro lib = new ControladorLibro();
         GestorPrestamos pre = new GestorPrestamos();
+        ControladorEjemplar ej = new ControladorEjemplar();
         
         
        // lib.menuLibro();
         
-        pre.menuPrestamo();
+       pre.menuPrestamo();
+       
+       ej.menu();
+        
+        
         
         System.out.println("Ingresar Prestamo: ");
         //pre.registrarPrestamo();

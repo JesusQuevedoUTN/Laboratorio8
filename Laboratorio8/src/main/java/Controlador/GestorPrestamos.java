@@ -21,7 +21,7 @@ public class GestorPrestamos {
         
         do{
             try{
-                System.out.println("=== Libro Menu ===");
+                System.out.println("=== Prestamo Menu ===");
                 System.out.println("1. Registrar prestamo ");
                 System.out.println("2. Registrar devolucion ");
                 System.out.println("3. Listar prestamos ");
