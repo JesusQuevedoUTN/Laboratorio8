@@ -24,7 +24,7 @@ public class ControladorEjemplar {
         
          do{
             try{
-                System.out.println("=== Libro Menu ===");
+                System.out.println("=== Ejemplar Menu ===");
                 System.out.println("1. Agregar ejemplar ");
                 System.out.println("2. Listar ejemplares de un libro ");
                 System.out.println("3. Modificar estado ");
@@ -39,9 +39,7 @@ public class ControladorEjemplar {
                  switch (menu){
                      case 1 -> agregarEjemplar();
                      case 2 -> listarEjemplares();
-                     case 3 -> {System.out.println("Ingrese el ISBN de libro:");
-                                ISBN = teclado.nextLine();
-                                modificarEstado(ISBN);}
+                     case 3 ->modificarEstado();
                  }
                 
             }catch (InputMismatchException e) {
@@ -54,6 +52,7 @@ public class ControladorEjemplar {
     public void agregarEjemplar(){
         Scanner teclado = new Scanner(System.in);
         int nro = 0;
+        
         
         System.out.println("Ingres ISBN: ");
         String isbn = teclado.nextLine();
@@ -72,38 +71,59 @@ public class ControladorEjemplar {
         }
     }
     
-    String sql = "INSERT INTO ejemplar (ISBN, nro_ejemplar) VALUES (?, ?)";
+    String sql = "INSERT INTO ejemplar (ISBN, nro_ejemplar, estado) VALUES (?, ?, ?)";
     
          try (Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql)){
              
              ps.setString(1, isbn);
              ps.setInt(2, nro);
+             ps.setString(3, "Disponible");
+             
+             int filas = ps.executeUpdate(); 
+             System.out.println("Ejemplar agregado. Filas insertadas: " + filas);
              
          }catch (SQLException e) {
             System.out.println("Error al agregar ejemplar: " + e.getMessage());
         }
     }
     
-    public void listarEjemplares(){   
-         String sql = "SELECT ISBN, nro_ejemplar, estado FROM EJEMPLAR";
-        try(Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()){
-
-            while(rs.next()){
-            String isbn = rs.getString("ISBN");
+    public void listarEjemplares(){ 
+        Scanner teclado = new Scanner(System.in);
+        String ISBN = null;
+        
+        System.out.println("Ingrese el ISBN del libro buscado: ");
+        ISBN = teclado.nextLine();
+        if (ISBN == null || ISBN.isEmpty()) {
+            throw new IllegalArgumentException("El ISBN no puede estar vacío.");
+        }
+        
+         String sql = "SELECT * FROM EJEMPLAR WHERE ISBN = ? ";
+         
+        try(Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql)){
+            ps.setString(1, ISBN);
+            
+            try(ResultSet rs = ps.executeQuery()){
+                while(rs.next()){
             int nro_ejemplar = rs.getInt("nro_ejemplar");
             String estado = rs.getString("estado");
             
-            System.out.println("ISBN: " + isbn + " Numero: " + nro_ejemplar + " Estado: " + estado);
+            System.out.println(" Numero: " + nro_ejemplar + " Estado: " + estado);
             }
+            }
+            
         }catch (SQLException e) {
-        System.out.println("Error al agregar el libro: " + e.getMessage());
+        System.out.println("Error al listar los ejemplares: " + e.getMessage());
     }   
     }
     
-    public void modificarEstado(String isbn){
+    public void modificarEstado(){
         Scanner teclado = new Scanner(System.in);
+        String isbn;
         int nro = 0;
         int estado = 0;
+        
+       System.out.println("Ingrese el ISBN de libro:");
+       isbn = teclado.nextLine();
         
     boolean valido = false;
     while (!valido) {
@@ -144,7 +164,7 @@ public class ControladorEjemplar {
         }
  
     }catch (SQLException e) {
-            System.out.println("Error al agregar ejemplar: " + e.getMessage());
+            System.out.println("Error al modificar el estado: " + e.getMessage());
         }
     
     }
