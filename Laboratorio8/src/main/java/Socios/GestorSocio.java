@@ -56,13 +56,13 @@ public class GestorSocio {
     public void buscarSocioPorDni(String dniBuscado) {
         String sql = "SELECT id_socio, nombre, DNI, telefono, fecha_alta FROM SOCIO WHERE DNI = ?";
 
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion(); 
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, dniBuscado);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // Si encontró el socio, mostramos sus datos
                     int id = rs.getInt("id_socio");
                     String nombre = rs.getString("nombre");
                     String dni = rs.getString("DNI");
@@ -77,13 +77,68 @@ public class GestorSocio {
                     System.out.println("Fecha de Alta: " + fechaAlta);
                     System.out.println("--------------------------\n");
                 } else {
-                    // Validación pedida por la consigna si no existe
                     System.out.println("No se encontró un socio con el DNI: " + dniBuscado);
                 }
             }
 
         } catch (SQLException e) {
             System.out.println("Error al buscar socio: " + e.getMessage());
+        }
+    }
+
+    // 4.4. Modificar socio (Solo Nombre y Teléfono)
+    public void modificarSocio(String dni, String nuevoNombre, String nuevoTelefono) {
+        String sql = "UPDATE SOCIO SET nombre = ?, telefono = ? WHERE DNI = ?";
+
+        try (Connection con = Conexion.getConexion(); 
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, nuevoNombre);
+            ps.setString(2, nuevoTelefono);
+            ps.setString(3, dni);
+
+            int filas = ps.executeUpdate();
+            if (filas > 0) {
+                System.out.println("¡Socio modificado correctamente!");
+            } else {
+                System.out.println("No se encontró un socio con el DNI: " + dni);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al modificar socio: " + e.getMessage());
+        }
+    }
+
+    // 4.5. Eliminar socio (Validando préstamos)
+    public void eliminarSocio(int idSocio) {
+        // Validación obligatoria: verificar si tiene préstamos activos
+        String sqlCheck = "SELECT COUNT(*) AS total FROM PRESTAMO WHERE id_socio = ?";
+        String sqlDelete = "DELETE FROM SOCIO WHERE id_socio = ?";
+
+        try (Connection con = Conexion.getConexion()) {
+            
+            // 1. Verificamos los préstamos
+            try (PreparedStatement psCheck = con.prepareStatement(sqlCheck)) {
+                psCheck.setInt(1, idSocio);
+                try (ResultSet rs = psCheck.executeQuery()) {
+                    if (rs.next() && rs.getInt("total") > 0) {
+                        System.out.println("Error: No se puede eliminar el socio porque tiene préstamos asociados.");
+                        return; // Cortamos acá
+                    }
+                }
+            }
+
+            // 2. Si no tiene préstamos, lo eliminamos
+            try (PreparedStatement psDelete = con.prepareStatement(sqlDelete)) {
+                psDelete.setInt(1, idSocio);
+                int filas = psDelete.executeUpdate();
+                if (filas > 0) {
+                    System.out.println("¡Socio eliminado exitosamente!");
+                } else {
+                    System.out.println("No se encontró un socio con el ID: " + idSocio);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al eliminar socio: " + e.getMessage());
         }
     }
 }
