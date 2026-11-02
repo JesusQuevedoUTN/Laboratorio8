@@ -39,9 +39,7 @@ public class ControladorEjemplar {
                  switch (menu){
                      case 1 -> agregarEjemplar();
                      case 2 -> listarEjemplares();
-                     case 3 -> {System.out.println("Ingrese el ISBN de libro:");
-                                ISBN = teclado.nextLine();
-                                modificarEstado(ISBN);}
+                     case 3 ->modificarEstado();
                  }
                 
             }catch (InputMismatchException e) {
@@ -100,10 +98,14 @@ public class ControladorEjemplar {
     }   
     }
     
-    public void modificarEstado(String isbn){
+    public void modificarEstado(){
         Scanner teclado = new Scanner(System.in);
+        String isbn;
         int nro = 0;
         int estado = 0;
+        
+       System.out.println("Ingrese el ISBN de libro:");
+       isbn = teclado.nextLine();
         
     boolean valido = false;
     while (!valido) {

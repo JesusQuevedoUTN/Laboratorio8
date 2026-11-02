@@ -1,6 +1,7 @@
 package Main;
 
 import Controlador.ControladorLibro;
+import Controlador.GestorPrestamos;
 import Socios.GestorSocio;
 
 public class Prueba {
@@ -8,13 +9,25 @@ public class Prueba {
         // Creamos una instancia de nuestro gestor
         GestorSocio gestor = new GestorSocio();
         ControladorLibro lib = new ControladorLibro();
+        GestorPrestamos pre = new GestorPrestamos();
         
-        System.out.println("Ingresar Lib: ");
-        lib.agregarLibro();
         
-        System.out.println("Lista libros: ");
-        lib.listarLibros();
+       // lib.menuLibro();
         
+        pre.menuPrestamo();
+        
+        System.out.println("Ingresar Prestamo: ");
+        //pre.registrarPrestamo();
+        
+        System.out.println("Registrar devolucion: ");
+        //pre.registrarDevolucion();
+        
+        System.out.println("Listar prestamos: ");
+        //pre.listarPrestamos();
+        
+        
+        
+       /* 
         // 0. Opcional pero recomendado: Probamos listar todos los socios de la tabla
         System.out.println("=== 1. LISTANDO TODOS LOS SOCIOS ===");
         gestor.listarSocios();
@@ -25,6 +38,6 @@ public class Prueba {
         
         // 2. Probamos buscar un DNI que NO existe para ver si salta la validación
         System.out.println("=== 3. PROBANDO BÚSQUEDA INEXISTENTE ===");
-        gestor.buscarSocioPorDni("99999999");
+        gestor.buscarSocioPorDni("99999999");*/
     }
 }

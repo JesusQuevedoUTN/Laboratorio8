@@ -42,16 +42,9 @@ public class ControladorLibro {
                  switch (menu){
                      case 1 -> agregarLibro();
                      case 2 -> listarLibros();
-                     case 3 ->{ System.out.println("Ingrese el ISBN de libro:");
-                               ISBN = teclado.nextLine();
-                               buscarLibroPorISBN(ISBN);
-                               }
-                     case 4 -> {System.out.println("Ingrese el ISBN de libro:");
-                               ISBN = teclado.nextLine();
-                         modificarLibro(ISBN);}
-                     case 5 -> {System.out.println("Ingrese el ISBN de libro:");
-                               ISBN = teclado.nextLine();
-                         eliminarLibro(ISBN);}
+                     case 3 ->buscarLibroPorISBN();
+                     case 4 ->modificarLibro();
+                     case 5 ->eliminarLibro();
                  }
                 
             }catch (InputMismatchException e) {
@@ -133,7 +126,16 @@ public class ControladorLibro {
     }   
     }
     
-    public void buscarLibroPorISBN(String isbn){
+    public void buscarLibroPorISBN(){
+        Scanner teclado = new Scanner(System.in);
+        String isbn = null;
+        
+        System.out.println("Ingrese el ISBN de libro del libro buscado:");
+        isbn = teclado.nextLine();
+        if (isbn == null || isbn.isEmpty()) {
+            throw new IllegalArgumentException("El ISBN no puede estar vacío.");
+        }
+        
        String sql = "SELECT * FROM LIBRO WHERE ISBN = ?";
         
         try(Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql)){
@@ -163,8 +165,16 @@ public class ControladorLibro {
         }
     }
     
-    public void modificarLibro(String ISBN){
-      Scanner teclado = new Scanner(System.in);
+    public void modificarLibro(){
+        Scanner teclado = new Scanner(System.in);
+        String ISBN = null;
+        
+        System.out.println("Ingrese el ISBN del libro buscado: ");
+        ISBN = teclado.nextLine();
+        if (ISBN == null || ISBN.isEmpty()) {
+            throw new IllegalArgumentException("El ISBN no puede estar vacío.");
+        }
+      
       int anio = 0;
       System.out.println("Ingrese titulo: ");
         String titulo = teclado.nextLine();
@@ -208,7 +218,15 @@ public class ControladorLibro {
         }
     }
     
-    public void eliminarLibro(String ISBN){
+    public void eliminarLibro(){
+        Scanner teclado = new Scanner(System.in);
+        String ISBN = null;
+        
+        System.out.println("Ingrese el ISBN del libro buscado: ");
+        ISBN = teclado.nextLine();
+        if (ISBN == null || ISBN.isEmpty()) {
+            throw new IllegalArgumentException("El ISBN no puede estar vacío.");
+        }
         String sql = "DELETE FROM LIBRO WHERE ISBN = ?";
         try (Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql)){
             ps.setString(1, ISBN);  
