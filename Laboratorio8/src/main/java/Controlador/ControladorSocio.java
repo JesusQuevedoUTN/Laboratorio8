@@ -23,7 +23,7 @@ public class ControladorSocio implements ControladorMenu {
                 System.out.println("5. Eliminar socio");
                 System.out.println("0. Volver al menú principal");
                 System.out.print("Opción: ");
-                
+
                 menu = Integer.parseInt(teclado.nextLine());
 
                 switch (menu) {

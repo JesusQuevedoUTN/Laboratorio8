@@ -5,13 +5,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
 
 public class GestorEjemplar {
 
-    
-    
-    public void agregarEjemplar() {
+    /*public void agregarEjemplar() {
         Scanner teclado = new Scanner(System.in);
         int nro = 0;
 
@@ -47,17 +44,25 @@ public class GestorEjemplar {
             System.out.println("Error al agregar ejemplar: " + e.getMessage());
         }
     }
+     */
+    public void agregarEjemplar(String isbn, int nro, String estado) {
+        String sql = "INSERT INTO ejemplar (ISBN, nro_ejemplar, estado) VALUES (?, ?, ?)";
 
-    public void listarEjemplares() {
-        Scanner teclado = new Scanner(System.in);
-        String ISBN = null;
+        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-        System.out.println("Ingrese el ISBN del libro buscado: ");
-        ISBN = teclado.nextLine();
-        if (ISBN == null || ISBN.isEmpty()) {
-            throw new IllegalArgumentException("El ISBN no puede estar vacío.");
+            ps.setString(1, isbn);
+            ps.setInt(2, nro);
+            ps.setString(3, estado);
+
+            int filas = ps.executeUpdate();
+            System.out.println("Ejemplar agregado. Filas insertadas: " + filas);
+
+        } catch (SQLException e) {
+            System.out.println("Error al agregar ejemplar: " + e.getMessage());
         }
+    }
 
+    public void listarEjemplares(String ISBN) {
         String sql = "SELECT * FROM EJEMPLAR WHERE ISBN = ? ";
 
         try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -77,6 +82,7 @@ public class GestorEjemplar {
         }
     }
 
+    /*
     public void modificarEstado() {
         Scanner teclado = new Scanner(System.in);
         String isbn;
@@ -115,6 +121,30 @@ public class GestorEjemplar {
             } else {
                 ps.setString(1, "Prestado");
             }
+
+            int filas = ps.executeUpdate();
+
+            if (filas > 0) {
+                System.out.println("Estado actualizado ");
+            } else {
+                System.out.println("No se pudo cambiar: el ejemplar no existe o no estaba ");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error al modificar el estado: " + e.getMessage());
+        }
+
+    }
+     */
+    public void modificarEstado(String isbn, int nro, String estado) {
+
+        String sql = "UPDATE EJEMPLAR SET estado = ?" + "WHERE ISBN = ? AND nro_ejemplar = ?";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, isbn);
+            ps.setInt(2, nro);
+            ps.setString(3, estado);
 
             int filas = ps.executeUpdate();
 

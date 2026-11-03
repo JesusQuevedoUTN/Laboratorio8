@@ -2,6 +2,7 @@ package Controlador;
 
 import Gestor.GestorEjemplar;
 import herramientas.ControladorMenu;
+import herramientas.Estado;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -30,11 +31,11 @@ public class ControladorEjemplar implements ControladorMenu {
 
                 switch (menu) {
                     case 1 ->
-                        gestor.agregarEjemplar();
+                        pedirYAgregarEjemplar();
                     case 2 ->
-                        gestor.listarEjemplares();
+                        pedirYListarEjemplares();
                     case 3 ->
-                        gestor.modificarEstado();
+                        pedirYModificarEstado();
                 }
 
             } catch (InputMismatchException e) {
@@ -42,6 +43,49 @@ public class ControladorEjemplar implements ControladorMenu {
             }
             teclado.nextLine();
         } while (menu != 0);
+    }
+
+    private void pedirYAgregarEjemplar() {
+        System.out.println("Ingres ISBN: ");
+        String isbn = teclado.nextLine();
+        System.out.println("Ingrese nro de ejemplar: ");
+        int nro = Integer.parseInt(teclado.nextLine());
+        System.out.println("Que estado quiere darle al ejemplar [1:Disponible|2:Prestado]: ");
+        int estado = Integer.parseInt(teclado.nextLine());
+        if (estado == 1) {
+            gestor.agregarEjemplar(isbn, nro, Estado.Disponible.name());
+        } else {
+
+            gestor.agregarEjemplar(isbn, nro, Estado.Prestado.name());
+        }
+    }
+
+    private void pedirYModificarEstado() {
+        System.out.println("Ingrese el ISBN del Ejemplar a Buscar:");
+        String isbn = teclado.nextLine();
+        System.out.println("Ingrese nro de ejemplar: ");
+        int nro = Integer.parseInt(teclado.nextLine());
+        System.out.println("Que estado quiere darle al ejemplar [1:Disponible|2:Prestado]: ");
+        int estado = Integer.parseInt(teclado.nextLine());
+
+        if (estado == 1) {
+            gestor.modificarEstado(isbn, nro, Estado.Disponible.name());
+        } else {
+
+            gestor.modificarEstado(isbn, nro, Estado.Prestado.name());
+        }
+    }
+
+    private void pedirYListarEjemplares() {
+        String ISBN = null;
+
+        System.out.println("Ingrese el ISBN del libro buscado: ");
+        ISBN = teclado.nextLine();
+        if (ISBN == null || ISBN.isEmpty()) {
+            throw new IllegalArgumentException("El ISBN no puede estar vacío.");
+        }
+
+        gestor.listarEjemplares(ISBN);
     }
 
 }

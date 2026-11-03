@@ -1,5 +1,10 @@
 package Main;
 
+import Controlador.ControladorEjemplar;
+import Controlador.ControladorLibro;
+import Controlador.ControladorPrestamo;
+import Controlador.ControladorSocio;
+import herramientas.ControladorMenu;
 import java.util.Scanner;
 
 public class SelectorMenu {
@@ -7,7 +12,6 @@ public class SelectorMenu {
     public void seleccionar() {
         Scanner teclado = new Scanner(System.in);
         int menu = -1;
-
 
         do {
             try {
@@ -21,20 +25,27 @@ public class SelectorMenu {
                         + "0. Salir");
                 menu = Integer.parseInt(teclado.nextLine());
 
+                ControladorMenu controlador = null;
+
                 switch (menu) {
                     case 1 ->
-                        System.out.println("En Construccion...");
+                        controlador = new ControladorLibro();
                     case 2 ->
-                        System.out.println("En Construccion...");
+                        controlador = new ControladorSocio();
                     case 3 ->
-                        System.out.println("En Construccion...");
+                        controlador = new ControladorEjemplar();
                     case 4 ->
-                        System.out.println("En Construccion...");
+                        controlador = new ControladorPrestamo();
                     case 0 ->
-                        System.out.println("En Construccion...");
+                        System.out.println("Saliendo del sistema...");
                     default ->
                         System.out.println("El número ingresado es inválido");
                 }
+
+                if (controlador != null) {
+                    controlador.ejecutarMenu();
+                }
+
             } catch (NumberFormatException e) {
                 System.out.println("Error: Tipo de dato incorrecto.");
             }

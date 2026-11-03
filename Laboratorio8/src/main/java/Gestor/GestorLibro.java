@@ -97,6 +97,5 @@ public class GestorLibro {
             System.out.println("Error al eliminar libro: " + e.getMessage());
         }
     }
-    
-    
+
 }
