@@ -1,6 +1,6 @@
-package Socios;
+package Gestor;
 
-import Main.Conexion;
+import herramientas.Conexion;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -56,8 +56,7 @@ public class GestorSocio {
     public void buscarSocioPorDni(String dniBuscado) {
         String sql = "SELECT id_socio, nombre, DNI, telefono, fecha_alta FROM SOCIO WHERE DNI = ?";
 
-        try (Connection con = Conexion.getConexion(); 
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, dniBuscado);
 
@@ -90,8 +89,7 @@ public class GestorSocio {
     public void modificarSocio(String dni, String nuevoNombre, String nuevoTelefono) {
         String sql = "UPDATE SOCIO SET nombre = ?, telefono = ? WHERE DNI = ?";
 
-        try (Connection con = Conexion.getConexion(); 
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, nuevoNombre);
             ps.setString(2, nuevoTelefono);
@@ -115,7 +113,7 @@ public class GestorSocio {
         String sqlDelete = "DELETE FROM SOCIO WHERE id_socio = ?";
 
         try (Connection con = Conexion.getConexion()) {
-            
+
             // 1. Verificamos los préstamos
             try (PreparedStatement psCheck = con.prepareStatement(sqlCheck)) {
                 psCheck.setInt(1, idSocio);
