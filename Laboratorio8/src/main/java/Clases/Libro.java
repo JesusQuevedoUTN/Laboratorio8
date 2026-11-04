@@ -1,10 +1,8 @@
-package Libro;
+package Clases;
 
+public class Libro {
 
-public class Libro{
-    
     private String ISBN;
-    
     private String titulo;
     private String autor;
     private String editorial;
@@ -66,7 +64,4 @@ public class Libro{
         return "Libro{" + "ISBN=" + ISBN + ", titulo=" + titulo + ", autor=" + autor + ", editorial=" + editorial + ", aniopublicacion=" + aniopublicacion + '}';
     }
 
-    
-    
-    
 }

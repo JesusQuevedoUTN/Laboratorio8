@@ -1,10 +1,10 @@
-package Libro;
+package Clases;
 
+import herramientas.Estado;
 
 public class Ejemplar {
-    
+
     private String ISBN;
-    
     private int nro_ejemplar;
     private Estado estado;
 
@@ -45,6 +45,5 @@ public class Ejemplar {
     public String toString() {
         return "Ejemplar{" + "ISBN=" + ISBN + ", nro_ejemplar=" + nro_ejemplar + ", estado=" + estado + '}';
     }
-    
-    
+
 }

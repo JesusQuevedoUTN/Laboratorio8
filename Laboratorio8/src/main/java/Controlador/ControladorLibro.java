@@ -1,30 +1,20 @@
 package Controlador;
 
-import Libro.Libro;
-import java.util.InputMismatchException;
+import Gestor.GestorLibro;
+import herramientas.ControladorMenu;
 import java.util.Scanner;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.Scanner;
-import Main.Conexion;
 
+public class ControladorLibro implements ControladorMenu {
 
-public class ControladorLibro {
+    private GestorLibro gestor = new GestorLibro();
+    private Scanner teclado = new Scanner(System.in);
 
-    
-    public void menuLibro(){
-        Scanner teclado = new Scanner(System.in);
+    @Override
+    public void ejecutarMenu() {
         int menu = -1;
-        Libro libro;
-        String ISBN = null;
-        
-        do{
-            try{
+
+        do {
+            try {
                 System.out.println("=== Libro Menu ===");
                 System.out.println("1. Agregar libro ");
                 System.out.println("2. Listar libros ");
@@ -33,191 +23,69 @@ public class ControladorLibro {
                 System.out.println("5. Eliminar libro ");
                 System.out.println("0. Salir");
                 System.out.println("Opcion: ");
-                menu = teclado.nextInt();
-                
-                if (menu < 0 || menu > 6) {
-                    System.out.println("El numero ingresado es invalido");
+                menu = Integer.parseInt(teclado.nextLine());
+
+                switch (menu) {
+                    case 1 ->
+                        pedirYAgregarLibro();
+                    case 2 ->
+                        gestor.listarLibros();
+                    case 3 ->
+                        pedirYBuscarLibro();
+                    case 4 ->
+                        pedirYModificarLibro();
+                    case 5 ->
+                        pedirYEliminarLibro();
+                    case 0 ->
+                        System.out.println("Volviendo al menú principal...");
+                    default ->
+                        System.out.println("El numero ingresado es invalido");
                 }
-                
-                 switch (menu){
-                     case 1 -> agregarLibro();
-                     case 2 -> listarLibros();
-                     case 3 ->{ System.out.println("Ingrese el ISBN de libro:");
-                               ISBN = teclado.nextLine();
-                               buscarLibroPorISBN(ISBN);
-                               }
-                     case 4 -> {System.out.println("Ingrese el ISBN de libro:");
-                               ISBN = teclado.nextLine();
-                         modificarLibro(ISBN);}
-                     case 5 -> {System.out.println("Ingrese el ISBN de libro:");
-                               ISBN = teclado.nextLine();
-                         eliminarLibro(ISBN);}
-                 }
-                
-            }catch (InputMismatchException e) {
-                System.out.println("Error: Tipo de dato incorrecto (Ingresó letras o formato numérico inválido).");
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Tipo de dato incorrecto.");
             }
-            teclado.nextLine();
-        } while(menu != 0);
+        } while (menu != 0);
     }
-    
-    public void agregarLibro(){
-        Scanner teclado = new Scanner(System.in);
-        int anio = 0;
-        
-        System.out.println("Ingres ISBN: ");
+
+    private void pedirYAgregarLibro() {
+        System.out.println("Ingrese ISBN: ");
         String isbn = teclado.nextLine();
-        if (isbn == null || isbn.isEmpty()) {
-            throw new IllegalArgumentException("El ISBN no puede estar vacío.");
-        }
         System.out.println("Ingrese titulo: ");
         String titulo = teclado.nextLine();
-        if (titulo == null || titulo.isEmpty()) {
-            throw new IllegalArgumentException("El titulo no puede estar vacío.");
-        }
         System.out.println("Ingrese autor: ");
         String autor = teclado.nextLine();
-        if (autor == null || autor.isEmpty()) {
-            throw new IllegalArgumentException("El autor no puede estar vacío.");
-        }
         System.out.println("Ingrese editorial: ");
         String editorial = teclado.nextLine();
-        if (editorial == null || editorial.isEmpty()) {
-            throw new IllegalArgumentException("La editorial no puede estar vacío.");
-        }
-        try{
         System.out.println("Ingrese anio de publicacion: ");
-        anio = Integer.parseInt(teclado.nextLine());
-        }catch(NumberFormatException e){
-         System.out.println("Error: el año debe ser un número entero. Intente de nuevo.");
-        }
-        
-        String sql = "INSERT INTO LIBRO (ISBN, titulo, autor, editorial, anio_publicacion) VALUES (?, ?, ?, ?, ?)";
-        
-         try (Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql)) {
+        int anio = Integer.parseInt(teclado.nextLine());
 
-        ps.setString(1, isbn);
-        ps.setString(2, titulo);
-        ps.setString(3, autor);
-        ps.setString(4, editorial);
-        ps.setInt(5, anio);
+        gestor.agregarLibro(isbn, titulo, autor, editorial, anio);
+    }
 
-        int filas = ps.executeUpdate();
-        System.out.println("Libro agregado. Filas insertadas: " + filas);
+    private void pedirYBuscarLibro() {
+        System.out.println("Ingrese el ISBN a buscar: ");
+        String isbn = teclado.nextLine();
+        gestor.buscarLibroPorISBN(isbn);
+    }
 
-    } catch (SQLException e) {
-        System.out.println("Error al agregar el libro: " + e.getMessage());
-    }
-    
-    }
-    public void listarLibros(){
-        String sql = "SELECT ISBN, titulo, autor, editorial, anio_publicacion FROM LIBRO";
-        
-        try(Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()){
-            
-            while(rs.next()){
-            String isbn = rs.getString("ISBN");
-            String titulo = rs.getString("titulo");
-            String autor = rs.getString("autor");
-            String editorial = rs.getString("editorial");
-            int anio = rs.getInt("anio_publicacion");
-            
-            System.out.println("ISBN: " + isbn + " Titulo: " + titulo + " Autor: " + autor + " Editorial: " + editorial + " Anio de salida: " + anio);
-            }
-        }catch (SQLException e) {
-        System.out.println("Error al agregar el libro: " + e.getMessage());
-    }   
-    }
-    
-    public void buscarLibroPorISBN(String isbn){
-       String sql = "SELECT * FROM LIBRO WHERE ISBN = ?";
-        
-        try(Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql)){
-            ps.setString(1, isbn);
-            
-            try(ResultSet rs = ps.executeQuery()){
-             if(rs.next()){
-            String titulo = rs.getString("titulo");
-            String autor = rs.getString("autor");
-            String editorial = rs.getString("editorial");
-            int anio = rs.getInt("anio_publicacion");
-            
-                 System.out.println("\n--- ¡Libro Encontrado! ---");
-                    System.out.println("ISBN: " + isbn);
-                    System.out.println("Titulo: " + titulo);
-                    System.out.println("Autor: " + autor);
-                    System.out.println("Editorial: " + editorial);
-                    System.out.println("Anio de oublicacion: " + anio);
-                    System.out.println("--------------------------\n");
-                }else{
-                 System.out.println("Libro no encontrado");
-             }
-            }
-            
-        }catch (SQLException e) {
-            System.out.println("Error al buscar libro: " + e.getMessage());
-        }
-    }
-    
-    public void modificarLibro(String ISBN){
-      Scanner teclado = new Scanner(System.in);
-      int anio = 0;
-      System.out.println("Ingrese titulo: ");
+    private void pedirYModificarLibro() {
+        System.out.println("Ingrese el ISBN a modificar: ");
+        String isbn = teclado.nextLine();
+        System.out.println("Ingrese nuevo titulo: ");
         String titulo = teclado.nextLine();
-        if (titulo == null || titulo.isEmpty()) {
-            throw new IllegalArgumentException("El titulo no puede estar vacío.");
-        }
-        System.out.println("Ingrese autor: ");
+        System.out.println("Ingrese nuevo autor: ");
         String autor = teclado.nextLine();
-        if (autor == null || autor.isEmpty()) {
-            throw new IllegalArgumentException("El autor no puede estar vacío.");
-        }
-        System.out.println("Ingrese editorial: ");
+        System.out.println("Ingrese nueva editorial: ");
         String editorial = teclado.nextLine();
-        if (editorial == null || editorial.isEmpty()) {
-            throw new IllegalArgumentException("La editorial no puede estar vacío.");
-        }
-        try{
-        System.out.println("Ingrese anio de publicacion: ");
-         anio = Integer.parseInt(teclado.nextLine());
-        }catch(NumberFormatException e){
-         System.out.println("Error: el año debe ser un número entero. Intente de nuevo.");
-        }
-      String sql = "UPDATE LIBRO SET titulo = ?, autor = ?, editorial = ?, anio_publicacion = ? WHERE ISBN = ?";
-      
-      try (Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql)){
-        ps.setString(1, titulo);
-        ps.setString(2, autor);
-        ps.setString(3, editorial);
-        ps.setInt(4, anio);
-        ps.setString(5, ISBN);
-        
-        int filas = ps.executeUpdate();
-        
-        if(filas > 0){
-            System.out.println("Libro modificado correctamente");
-        }else{
-            System.out.println("No existe uh libro con ese ISBN");
-        }
-      }catch (SQLException e) {
-            System.out.println("Error al modificar libro: " + e.getMessage());
-        }
+        System.out.println("Ingrese nuevo anio: ");
+        int anio = Integer.parseInt(teclado.nextLine());
+
+        gestor.modificarLibro(isbn, titulo, autor, editorial, anio);
     }
-    
-    public void eliminarLibro(String ISBN){
-        String sql = "DELETE FROM LIBRO WHERE ISBN = ?";
-        try (Connection con = Conexion.getConexion();PreparedStatement ps = con.prepareStatement(sql)){
-            ps.setString(1, ISBN);  
-            int filas = ps.executeUpdate();
-        if (filas > 0) {
-            System.out.println("Libro eliminado correctamente.");
-        } else {
-            System.out.println("No existe un libro con ese ISBN.");
-        }
-            
-        }catch (SQLException e) {
-            System.out.println("Error al eliminar libro: " + e.getMessage());
-        }
+
+    private void pedirYEliminarLibro() {
+        System.out.println("Ingrese el ISBN a eliminar: ");
+        String isbn = teclado.nextLine();
+        gestor.eliminarLibro(isbn);
     }
-    
 }

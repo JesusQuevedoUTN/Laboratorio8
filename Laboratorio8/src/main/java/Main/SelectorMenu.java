@@ -1,6 +1,10 @@
 package Main;
 
-import java.util.InputMismatchException;
+import Controlador.ControladorEjemplar;
+import Controlador.ControladorLibro;
+import Controlador.ControladorPrestamo;
+import Controlador.ControladorSocio;
+import herramientas.ControladorMenu;
 import java.util.Scanner;
 
 public class SelectorMenu {
@@ -14,33 +18,37 @@ public class SelectorMenu {
                 System.out.println("====================================\n"
                         + "       SISTEMA DE BIBLIOTECA\n"
                         + "====================================\n"
-                        + "\n"
                         + "1. Gestionar libros\n"
                         + "2. Gestionar socios\n"
                         + "3. Gestionar ejemplares\n"
                         + "4. Gestionar préstamos\n"
                         + "0. Salir");
-                menu = teclado.nextInt();
+                menu = Integer.parseInt(teclado.nextLine());
 
-                if (menu < 0 || menu > 4) {
-                    System.out.println("El numero ingresado es invalido");
-                }
+                ControladorMenu controlador = null;
 
                 switch (menu) {
                     case 1 ->
-                        System.out.println("null");
+                        controlador = new ControladorLibro();
                     case 2 ->
-                        System.out.println("null");
+                        controlador = new ControladorSocio();
                     case 3 ->
-                        System.out.println("null");
+                        controlador = new ControladorEjemplar();
                     case 4 ->
-                        System.out.println("null");
+                        controlador = new ControladorPrestamo();
+                    case 0 ->
+                        System.out.println("Saliendo del sistema...");
+                    default ->
+                        System.out.println("El número ingresado es inválido");
                 }
-            } catch (InputMismatchException e) {
-                System.out.println("Error: Tipo de dato incorrecto (Ingresó letras o formato numérico inválido).");
-            }
-            teclado.nextLine(); // Limpiamos el buffer del Scanner para evitar bucle infinito
-        } while (menu < 0 || menu > 4);
-    }
 
+                if (controlador != null) {
+                    controlador.ejecutarMenu();
+                }
+
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Tipo de dato incorrecto.");
+            }
+        } while (menu != 0);
+    }
 }
