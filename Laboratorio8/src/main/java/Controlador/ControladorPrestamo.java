@@ -25,8 +25,9 @@ public class ControladorPrestamo implements ControladorMenu {
                 System.out.println("2. Registrar devolucion ");
                 System.out.println("3. Listar prestamos ");
                 System.out.println("0. Salir");
-                System.out.println("Opcion: ");
-                menu = teclado.nextInt();
+                System.out.print("Opcion: ");
+                String entrada = teclado.nextLine();
+                menu = Integer.parseInt(entrada);
 
                 if (menu < 0 || menu > 3) {
                     System.out.println("El numero ingresado es invalido");

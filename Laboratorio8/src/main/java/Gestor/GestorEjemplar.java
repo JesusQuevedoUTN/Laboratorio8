@@ -46,7 +46,7 @@ public class GestorEjemplar {
     }
      */
     public void agregarEjemplar(String isbn, int nro, String estado) {
-        String sql = "INSERT INTO ejemplar (ISBN, nro_ejemplar, estado) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO EJEMPLAR (ISBN, nro_ejemplar, estado) VALUES (?, ?, ?)";
 
         try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -142,9 +142,9 @@ public class GestorEjemplar {
 
         try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, isbn);
-            ps.setInt(2, nro);
-            ps.setString(3, estado);
+            ps.setString(1, estado);
+            ps.setString(2, isbn);
+            ps.setInt(3, nro);
 
             int filas = ps.executeUpdate();
 
