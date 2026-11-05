@@ -4,9 +4,9 @@ import herramientas.Estado;
 
 public class Ejemplar {
 
-    private String ISBN;
-    private int nro_ejemplar;
-    private Estado estado;
+    private String  ISBN;
+    private int     nro_ejemplar;
+    private Estado  estado;
 
     public Ejemplar() {
     }

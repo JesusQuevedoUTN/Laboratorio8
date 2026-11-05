@@ -15,14 +15,16 @@ public class ControladorLibro implements ControladorMenu {
 
         do {
             try {
-                System.out.println("=== Libro Menu ===");
-                System.out.println("1. Agregar libro ");
-                System.out.println("2. Listar libros ");
-                System.out.println("3. Buscar libro ");
-                System.out.println("4. Modificar libro ");
-                System.out.println("5. Eliminar libro ");
-                System.out.println("0. Salir");
-                System.out.println("Opcion: ");
+                System.out.print("=== Libro Menú ===\n"
+                        + "1. Agregar libro\n"
+                        + "2. Listar libros\n"
+                        + "3. Buscar libro\n"
+                        + "4. Modificar libro\n"
+                        + "5. Eliminar libro\n"
+                        + "0. Salir\n"
+                        + "Opcion: ");
+                
+                
                 menu = Integer.parseInt(teclado.nextLine());
 
                 switch (menu) {
@@ -36,10 +38,8 @@ public class ControladorLibro implements ControladorMenu {
                         pedirYModificarLibro();
                     case 5 ->
                         pedirYEliminarLibro();
-                    case 0 ->
-                        System.out.println("Volviendo al menú principal...");
                     default ->
-                        System.out.println("El numero ingresado es invalido");
+                        System.out.println("El número ingresado es inválido");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Error: Tipo de dato incorrecto.");

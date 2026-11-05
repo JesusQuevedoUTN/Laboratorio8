@@ -4,11 +4,11 @@ import java.sql.Date;
 
 public class Socio {
 
-    private int id_socio;
-    private String nombre;
-    private String dni;
-    private String telefono;
-    private Date fecha_alta;
+    private int     id_socio;
+    private String  nombre;
+    private String  dni;
+    private String  telefono;
+    private Date    fecha_alta;
 
     public Socio() {
     }

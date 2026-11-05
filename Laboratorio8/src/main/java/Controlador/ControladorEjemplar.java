@@ -3,7 +3,6 @@ package Controlador;
 import Gestor.GestorEjemplar;
 import herramientas.ControladorMenu;
 import herramientas.Estado;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class ControladorEjemplar implements ControladorMenu {
@@ -17,18 +16,15 @@ public class ControladorEjemplar implements ControladorMenu {
 
         do {
             try {
-                System.out.println("=== Ejemplar Menu ===");
-                System.out.println("1. Agregar ejemplar ");
-                System.out.println("2. Listar ejemplares de un libro ");
-                System.out.println("3. Modificar estado ");
-                System.out.println("0. Salir");
-                System.out.print("Opcion: ");
+                System.out.print("=== Ejemplar Menú ===\n"
+                        + "1. Agregar ejemplar\n"
+                        + "2. Listar ejemplares de un libro\n"
+                        + "3. Modificar estado\n"
+                        + "0. Salir\n"
+                        + "Opcion: ");
+                
                 String entrada = teclado.nextLine();
                 menu = Integer.parseInt(entrada);
-
-                if (menu < 0 || menu > 3) {
-                    System.out.println("El numero ingresado es invalido");
-                }
 
                 switch (menu) {
                     case 1 ->
@@ -37,12 +33,13 @@ public class ControladorEjemplar implements ControladorMenu {
                         pedirYListarEjemplares();
                     case 3 ->
                         pedirYModificarEstado();
+                    default ->
+                        System.out.println("El número ingresado es inválido");
                 }
 
-            } catch (InputMismatchException e) {
-                System.out.println("Error: Tipo de dato incorrecto (Ingresó letras o formato numérico inválido).");
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Tipo de dato incorrecto.");
             }
-            teclado.nextLine();
         } while (menu != 0);
     }
 

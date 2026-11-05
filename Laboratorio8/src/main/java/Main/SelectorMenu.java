@@ -9,41 +9,52 @@ import java.util.Scanner;
 
 public class SelectorMenu {
 
+    private Scanner teclado = new Scanner(System.in);
+
     public void seleccionar() {
-        Scanner teclado = new Scanner(System.in);
+        
+        //Controladores creados para no tener que hacer New en cada vuelta que da el do while
+        ControladorLibro menuLibro = new ControladorLibro();
+        ControladorSocio menuSocio = new ControladorSocio();
+        ControladorEjemplar menuEjemplar = new ControladorEjemplar();
+        ControladorPrestamo menuPrestamo = new ControladorPrestamo();
+        
+        //seleccion
+        ControladorMenu seleccion = null;
         int menu = -1;
 
         do {
             try {
-                System.out.println("====================================\n"
+                System.out.print("====================================\n"
                         + "       SISTEMA DE BIBLIOTECA\n"
                         + "====================================\n"
                         + "1. Gestionar libros\n"
                         + "2. Gestionar socios\n"
                         + "3. Gestionar ejemplares\n"
                         + "4. Gestionar préstamos\n"
-                        + "0. Salir");
+                        + "0. Salir\n"
+                        + "Opcion: ");
+                
                 menu = Integer.parseInt(teclado.nextLine());
 
-                ControladorMenu controlador = null;
-
+                //FALTA QUE AL ENTRAR EN UN MENU Y SALIR, SALGA DE UNA, HAY UN ERROR ACÁ
                 switch (menu) {
                     case 1 ->
-                        controlador = new ControladorLibro();
+                        seleccion = menuLibro;
                     case 2 ->
-                        controlador = new ControladorSocio();
+                        seleccion = menuSocio;
                     case 3 ->
-                        controlador = new ControladorEjemplar();
+                        seleccion = menuEjemplar;
                     case 4 ->
-                        controlador = new ControladorPrestamo();
+                        seleccion = menuPrestamo;
                     case 0 ->
-                        System.out.println("Saliendo del sistema...");
+                        System.out.println("Adios");
                     default ->
                         System.out.println("El número ingresado es inválido");
                 }
 
-                if (controlador != null) {
-                    controlador.ejecutarMenu();
+                if (seleccion != null) {
+                    seleccion.ejecutarMenu();
                 }
 
             } catch (NumberFormatException e) {

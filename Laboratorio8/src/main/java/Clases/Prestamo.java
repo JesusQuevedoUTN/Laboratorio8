@@ -4,13 +4,13 @@ import java.sql.Date;
 
 public class Prestamo {
 
-    private int id_prestamo;
-    private int id_socio;
-    private String ISBN;
-    private int nro_ejemplar;
-    private Date fecha_prestamo;
-    private Date fecha_prevista;
-    private Date fecha_real;
+    private int     id_prestamo;
+    private int     id_socio;
+    private String  ISBN;
+    private int     nro_ejemplar;
+    private Date    fecha_prestamo;
+    private Date    fecha_prevista;
+    private Date    fecha_real;
 
     public Prestamo() {
     }

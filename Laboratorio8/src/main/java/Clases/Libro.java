@@ -2,11 +2,11 @@ package Clases;
 
 public class Libro {
 
-    private String ISBN;
-    private String titulo;
-    private String autor;
-    private String editorial;
-    private int aniopublicacion;
+    private String  ISBN;
+    private String  titulo;
+    private String  autor;
+    private String  editorial;
+    private int     aniopublicacion;
 
     public Libro() {
     }

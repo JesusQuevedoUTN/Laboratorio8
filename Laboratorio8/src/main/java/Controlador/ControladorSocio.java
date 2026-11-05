@@ -15,14 +15,14 @@ public class ControladorSocio implements ControladorMenu {
 
         do {
             try {
-                System.out.println("\n=== Menú Socios ===");
-                System.out.println("1. Agregar socio");
-                System.out.println("2. Listar socios");
-                System.out.println("3. Buscar socio");
-                System.out.println("4. Modificar socio");
-                System.out.println("5. Eliminar socio");
-                System.out.println("0. Volver al menú principal");
-                System.out.print("Opción: ");
+                System.out.print("\n=== Socios Menú ===\n"
+                        + "1. Agregar socio\n"
+                        + "2. Listar socios\n"
+                        + "3. Buscar socio\n"
+                        + "4. Modificar socio\n"
+                        + "5. Eliminar socio\n"
+                        + "0. Volver al menú principal\n"
+                        + "Opción: ");
 
                 menu = Integer.parseInt(teclado.nextLine());
 
@@ -37,13 +37,12 @@ public class ControladorSocio implements ControladorMenu {
                         pedirYModificarSocio();
                     case 5 ->
                         pedirYEliminarSocio();
-                    case 0 ->
-                        System.out.println("Volviendo al menú principal...");
                     default ->
-                        System.out.println("Opción inválida.");
+                        System.out.println("El número ingresado es inválido");
                 }
+                
             } catch (NumberFormatException e) {
-                System.out.println("Error: Ingrese un número válido.");
+                System.out.println("Error: Tipo de dato incorrecto.");
             }
         } while (menu != 0);
     }

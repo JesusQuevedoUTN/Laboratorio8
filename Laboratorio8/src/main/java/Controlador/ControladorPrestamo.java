@@ -5,7 +5,6 @@ import herramientas.ControladorMenu;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class ControladorPrestamo implements ControladorMenu {
@@ -20,18 +19,16 @@ public class ControladorPrestamo implements ControladorMenu {
 
         do {
             try {
-                System.out.println("=== Prestamo Menu ===");
-                System.out.println("1. Registrar prestamo ");
-                System.out.println("2. Registrar devolucion ");
-                System.out.println("3. Listar prestamos ");
-                System.out.println("0. Salir");
-                System.out.print("Opcion: ");
+                System.out.print("=== Prestamo Menú ===\n"
+                        + "1. Registrar prestamo\n"
+                        + "2. Registrar devolucion\n"
+                        + "3. Listar prestamos\n"
+                        + "0. Salir\n"
+                        + "Opcion: ");
+                
                 String entrada = teclado.nextLine();
                 menu = Integer.parseInt(entrada);
 
-                if (menu < 0 || menu > 3) {
-                    System.out.println("El numero ingresado es invalido");
-                }
 
                 switch (menu) {
                     case 1 ->
@@ -40,12 +37,13 @@ public class ControladorPrestamo implements ControladorMenu {
                         pedirYRegistrarDevolucion();
                     case 3 ->
                         gestor.listarPrestamos();
+                    default ->
+                        System.out.println("El número ingresado es inválido");
                 }
 
-            } catch (InputMismatchException e) {
-                System.out.println("Error: Tipo de dato incorrecto (Ingresó letras o formato numérico inválido).");
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Tipo de dato incorrecto.");
             }
-            teclado.nextLine();
         } while (menu != 0);
     }
 
