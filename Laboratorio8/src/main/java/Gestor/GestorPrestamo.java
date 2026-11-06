@@ -9,6 +9,8 @@ import java.time.LocalDate;
 
 public class GestorPrestamo {
 
+    //Revisar que esté bien
+    
     public void registrarPrestamo(int idSocio, String isbn, int nroEjemplar, LocalDate fechaP, LocalDate fechaPrev) {
         String sqlUs = "SELECT id_socio FROM SOCIO WHERE id_socio = ?";
         String sqlLi = "SELECT ISBN FROM LIBRO WHERE ISBN = ?";
@@ -126,23 +128,30 @@ public class GestorPrestamo {
 
     public void listarPrestamos() {
 
-        String sql = "SELECT p.id_prestamo, s.nombre, l.titulo, p.fecha_prestamo "
+        String sql 
+                = "SELECT p.id_prestamo, s.nombre, l.titulo, p.fecha_prestamo "
                 + "FROM PRESTAMO p "
                 + "JOIN SOCIO s ON p.id_socio = s.id_socio "
                 + "JOIN LIBRO l ON p.ISBN = l.ISBN";
 
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql); ResultSet consulta = instruccion.executeQuery()) {
 
-            System.out.println("ID --- Usuario --- Libro --- Fecha de Prestamo");
+            System.out.printf(
+                "%-8s %-25s %-35s %-15s%n",
+                "ID", "SOCIO", "LIBRO", "FECHA");
+        System.out.println("-------------------------------------------------------------------------------------");
 
-            while (rs.next()) {
-                int idP = rs.getInt("id_prestamo");
-                String nom = rs.getString("nombre");
-                String titu = rs.getString("titulo");
-                LocalDate fechaP = rs.getDate("fecha_prestamo").toLocalDate();
+        while (consulta.next()) {
+            int idP = consulta.getInt("id_prestamo");
+            String nom = consulta.getString("nombre");
+            String titu = consulta.getString("titulo");
+            LocalDate fechaP = consulta.getDate("fecha_prestamo").toLocalDate();
 
-                System.out.println(idP + " ||  " + nom + " ||  " + titu + " ||  " + fechaP);
-            }
+            System.out.printf(
+                    "%-8d %-25s %-35s %-15s%n",
+                    idP, nom, titu, fechaP);
+        }
+        System.out.println();
 
         } catch (SQLException e) {
             System.out.println("Error al listar prestamos: " + e.getMessage());

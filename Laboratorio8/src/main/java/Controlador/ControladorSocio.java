@@ -2,6 +2,7 @@ package Controlador;
 
 import Gestor.GestorSocio;
 import herramientas.ControladorMenu;
+import herramientas.Mensaje;
 import herramientas.Pausa;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -19,7 +20,8 @@ public class ControladorSocio implements ControladorMenu {
 
         do {
             try {
-                System.out.print("\n=== Socios Menú ===\n"
+                System.out.print(
+                        "\n=== Socios Menú ===\n"
                         + "1. Agregar socio\n"
                         + "2. Listar socios\n"
                         + "3. Buscar socio\n"
@@ -44,14 +46,16 @@ public class ControladorSocio implements ControladorMenu {
                     case 0 ->
                         System.out.println("<--");
                     default ->
-                        System.out.println("El número ingresado es inválido");
+                        Mensaje.opcionInvalida();
                 }
 
             } catch (NumberFormatException e) {
-                System.out.println("Error: Tipo de dato incorrecto.");
+                Mensaje.tipoDatoIncorrecto();
             }
 
-            Pausa.pausar();
+            if (menu != 0) {
+                Pausa.pausar();
+            }
         } while (menu != 0);
     }
 
@@ -62,7 +66,7 @@ public class ControladorSocio implements ControladorMenu {
         String dni = teclado.nextLine();
         System.out.print("Ingrese teléfono: ");
         String tel = teclado.nextLine();
-        System.out.print("Ingrese fecha de alta (dd/MM/yyyy): ");
+        System.out.print("Ingrese fecha de alta (dd-mm-yyyy): ");
         LocalDate fecha = LocalDate.parse(teclado.nextLine(), formato);
 
         gestor.agregarSocio(nombre, dni, tel, fecha);
@@ -91,7 +95,7 @@ public class ControladorSocio implements ControladorMenu {
             int dniEliminar = Integer.parseInt(teclado.nextLine());
             gestor.eliminarSocio(dniEliminar);
         } catch (NumberFormatException e) {
-            System.out.println("Error: El ID debe ser un número entero.");
+            System.out.println("Error: El DNI debe ser un número entero.");
         }
     }
 }

@@ -8,21 +8,23 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class GestorSocio {
-// 4.1. Agregar socio
-
+    
+    // 4.1. Agregar socio
     public void agregarSocio(String nombre, String dni, String telefono, LocalDate fechaAlta) {
-        String sql = "INSERT INTO SOCIO (nombre, DNI, telefono, fecha_alta) VALUES (?, ?, ?, ?)";
+        String sql 
+                = "INSERT INTO SOCIO (nombre, DNI, telefono, fecha_alta) \n"
+                + "VALUES (?, ?, ?, ?)";
 
         // try-with-resources cierra el PreparedStatement y la conexión automáticamente
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
 
-            ps.setString(1, nombre);
-            ps.setString(2, dni);
-            ps.setString(3, telefono);
-            ps.setDate(4, java.sql.Date.valueOf(fechaAlta)); // Formato esperado por SQL: "YYYY-MM-DD"
+            instruccion.setString(1, nombre);
+            instruccion.setString(2, dni);
+            instruccion.setString(3, telefono);
+            instruccion.setDate(4, java.sql.Date.valueOf(fechaAlta)); // Formato esperado por SQL: "YYYY-MM-DD"
 
-            ps.executeUpdate();
-            System.out.println("¡Socio agregado exitosamente!");
+            instruccion.executeUpdate();
+            System.out.println("Socio agregado correctamente");
 
         } catch (SQLException e) {
             System.out.println("Error al agregar socio (¿DNI duplicado?): " + e.getMessage());
@@ -31,20 +33,27 @@ public class GestorSocio {
 
     // 4.2. Listar socios
     public void listarSocios() {
-        String sql = "SELECT id_socio, nombre, DNI, telefono FROM SOCIO";
+        String sql
+                = "SELECT id_socio, nombre, DNI, telefono FROM SOCIO \n"
+                + "ORDER BY id_socio ASC";
 
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql); ResultSet consulta = instruccion.executeQuery()) {
 
-            System.out.println("\nID\tNOMBRE\t\t\tDNI\t\tTELÉFONO");
-            System.out.println("---------------------------------------------------------");
+            System.out.printf(
+                    "%-5s %-25s %-15s %-15s%n",
+                    "ID", "NOMBRE", "DNI", "TELÉFONO");
+            System.out.println(
+                    "---------------------------------------------------------");
 
-            while (rs.next()) {
-                int id = rs.getInt("id_socio");
-                String nombre = rs.getString("nombre");
-                String dni = rs.getString("DNI");
-                String telefono = rs.getString("telefono");
+            while (consulta.next()) {
+                int id = consulta.getInt("id_socio");
+                String nombre = consulta.getString("nombre");
+                String dni = consulta.getString("DNI");
+                String telefono = consulta.getString("telefono");
 
-                System.out.println(id + "\t" + nombre + "\t\t" + dni + "\t" + telefono);
+                System.out.printf(
+                        "%-5d %-25s %-15s %-15s\n",
+                        id, nombre, dni, telefono);
             }
             System.out.println();
 
@@ -55,19 +64,21 @@ public class GestorSocio {
 
     // 4.3. Buscar socio por DNI
     public void buscarSocioPorDni(String dniBuscado) {
-        String sql = "SELECT id_socio, nombre, DNI, telefono, fecha_alta FROM SOCIO WHERE DNI = ?";
+        String sql 
+                = "SELECT id_socio, nombre, DNI, telefono, fecha_alta FROM SOCIO \n"
+                + "WHERE DNI = ?";
 
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
 
-            ps.setString(1, dniBuscado);
+            instruccion.setString(1, dniBuscado);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int id = rs.getInt("id_socio");
-                    String nombre = rs.getString("nombre");
-                    String dni = rs.getString("DNI");
-                    String telefono = rs.getString("telefono");
-                    String fechaAlta = rs.getString("fecha_alta");
+            try (ResultSet consulta = instruccion.executeQuery()) {
+                if (consulta.next()) {
+                    int id = consulta.getInt("id_socio");
+                    String nombre = consulta.getString("nombre");
+                    String dni = consulta.getString("DNI");
+                    String telefono = consulta.getString("telefono");
+                    String fechaAlta = consulta.getString("fecha_alta");
 
                     System.out.println("\n--- ¡Socio Encontrado! ---");
                     System.out.println("ID: " + id);
@@ -88,15 +99,17 @@ public class GestorSocio {
 
     // 4.4. Modificar socio (Solo Nombre y Teléfono)
     public void modificarSocio(String dni, String nuevoNombre, String nuevoTelefono) {
-        String sql = "UPDATE SOCIO SET nombre = ?, telefono = ? WHERE DNI = ?";
+        String sql 
+                = "UPDATE SOCIO SET nombre = ?, telefono = ? \n"
+                + "WHERE DNI = ?";
 
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
 
-            ps.setString(1, nuevoNombre);
-            ps.setString(2, nuevoTelefono);
-            ps.setString(3, dni);
+            instruccion.setString(1, nuevoNombre);
+            instruccion.setString(2, nuevoTelefono);
+            instruccion.setString(3, dni);
 
-            int filas = ps.executeUpdate();
+            int filas = instruccion.executeUpdate();
             if (filas > 0) {
                 System.out.println("¡Socio modificado correctamente!");
             } else {
@@ -107,11 +120,19 @@ public class GestorSocio {
         }
     }
 
+    
+    //VERIFICAR QUE ESTE BIEN
+    
     // 4.5. Eliminar socio (Validando préstamos)
     public void eliminarSocio(int dniSocio) {
         // Validación obligatoria: verificar si tiene préstamos activos
-        String sqlCheck = "SELECT COUNT(*) AS total FROM PRESTAMO WHERE DNI = ?";
-        String sqlDelete = "DELETE FROM SOCIO WHERE DNI = ?";
+        String sqlCheck 
+                = "SELECT COUNT(*) AS total FROM PRESTAMO \n"
+                + "WHERE DNI = ?";
+        
+        String sqlDelete 
+                = "DELETE FROM SOCIO \n"
+                + "WHERE DNI = ?";
 
         try (Connection con = Conexion.getConexion()) {
 

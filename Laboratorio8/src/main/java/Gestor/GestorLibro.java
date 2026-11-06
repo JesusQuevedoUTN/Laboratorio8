@@ -9,33 +9,49 @@ import java.sql.SQLException;
 public class GestorLibro {
 
     public void agregarLibro(String isbn, String titulo, String autor, String editorial, int anio) {
-        String sql = "INSERT INTO LIBRO (ISBN, titulo, autor, editorial, anio_publicacion) VALUES (?, ?, ?, ?, ?)";
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, isbn);
-            ps.setString(2, titulo);
-            ps.setString(3, autor);
-            ps.setString(4, editorial);
-            ps.setInt(5, anio);
+        String sql
+                = "INSERT INTO LIBRO (ISBN, titulo, autor, editorial, anio_publicacion) \n"
+                + "VALUES (?, ?, ?, ?, ?)";
 
-            int filas = ps.executeUpdate();
-            System.out.println("Libro agregado. Filas insertadas: " + filas);
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+            instruccion.setString(1, isbn);
+            instruccion.setString(2, titulo);
+            instruccion.setString(3, autor);
+            instruccion.setString(4, editorial);
+            instruccion.setInt(5, anio);
+
+            instruccion.executeUpdate();
+            System.out.println("Libro agregado correctamente");
+
         } catch (SQLException e) {
             System.out.println("Error al agregar el libro: " + e.getMessage());
         }
     }
 
     public void listarLibros() {
-        String sql = "SELECT ISBN, titulo, autor, editorial, anio_publicacion FROM LIBRO";
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                String isbn = rs.getString("ISBN");
-                String titulo = rs.getString("titulo");
-                String autor = rs.getString("autor");
-                String editorial = rs.getString("editorial");
-                int anio = rs.getInt("anio_publicacion");
+        String sql
+                = "SELECT ISBN, titulo, autor, editorial, anio_publicacion\n"
+                + "FROM LIBRO\n"
+                + "ORDER BY ISBN ASC;";
 
-                System.out.println("ISBN: " + isbn + " Titulo: " + titulo + " Autor: " + autor + " Editorial: " + editorial + " Anio de salida: " + anio);
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql); ResultSet consulta = instruccion.executeQuery()) {
+            System.out.printf(
+                    "%-20s %-30s %-25s %-25s %-10s%n",
+                    "ISBN", "TÍTULO", "AUTOR", "EDITORIAL", "AÑO");
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
+
+            while (consulta.next()) {
+                String isbn = consulta.getString("ISBN");
+                String titulo = consulta.getString("titulo");
+                String autor = consulta.getString("autor");
+                String editorial = consulta.getString("editorial");
+                int anio = consulta.getInt("anio_publicacion");
+
+                System.out.printf(
+                        "%-20s %-30s %-25s %-25s %-10d%n",
+                        isbn, titulo, autor, editorial, anio);
             }
+            System.out.println();
         } catch (SQLException e) {
             System.out.println("Error al listar libros: " + e.getMessage());
         }
@@ -43,11 +59,11 @@ public class GestorLibro {
 
     public void buscarLibroPorISBN(String isbn) {
         String sql = "SELECT * FROM LIBRO WHERE ISBN = ?";
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, isbn);
-            try (ResultSet rs = ps.executeQuery()) {
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+            instruccion.setString(1, isbn);
+            try (ResultSet rs = instruccion.executeQuery()) {
                 if (rs.next()) {
-                    System.out.println("\n--- ¡Libro Encontrado! ---");
+                    System.out.println("\n--- Libro Encontrado ---");
                     System.out.println("ISBN: " + isbn);
                     System.out.println("Titulo: " + rs.getString("titulo"));
                     System.out.println("Autor: " + rs.getString("autor"));
@@ -64,15 +80,18 @@ public class GestorLibro {
     }
 
     public void modificarLibro(String isbn, String titulo, String autor, String editorial, int anio) {
-        String sql = "UPDATE LIBRO SET titulo = ?, autor = ?, editorial = ?, anio_publicacion = ? WHERE ISBN = ?";
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, titulo);
-            ps.setString(2, autor);
-            ps.setString(3, editorial);
-            ps.setInt(4, anio);
-            ps.setString(5, isbn);
+        String sql
+                = "UPDATE LIBRO SET titulo = ?, autor = ?, editorial = ?, anio_publicacion = ? \n"
+                + "WHERE ISBN = ?";
 
-            int filas = ps.executeUpdate();
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+            instruccion.setString(1, titulo);
+            instruccion.setString(2, autor);
+            instruccion.setString(3, editorial);
+            instruccion.setInt(4, anio);
+            instruccion.setString(5, isbn);
+
+            int filas = instruccion.executeUpdate();
             if (filas > 0) {
                 System.out.println("Libro modificado correctamente");
             } else {
@@ -84,10 +103,13 @@ public class GestorLibro {
     }
 
     public void eliminarLibro(String isbn) {
-        String sql = "DELETE FROM LIBRO WHERE ISBN = ?";
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, isbn);
-            int filas = ps.executeUpdate();
+        String sql
+                = "DELETE FROM LIBRO \n"
+                + "WHERE ISBN = ?";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+            instruccion.setString(1, isbn);
+            int filas = instruccion.executeUpdate();
             if (filas > 0) {
                 System.out.println("Libro eliminado correctamente.");
             } else {

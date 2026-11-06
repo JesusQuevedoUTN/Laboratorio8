@@ -3,6 +3,7 @@ package Controlador;
 import Gestor.GestorEjemplar;
 import herramientas.ControladorMenu;
 import herramientas.Estado;
+import herramientas.Mensaje;
 import herramientas.Pausa;
 import java.util.Scanner;
 
@@ -17,13 +18,14 @@ public class ControladorEjemplar implements ControladorMenu {
 
         do {
             try {
-                System.out.print("=== Ejemplar Menú ===\n"
+                System.out.print(
+                        "\n=== Ejemplar Menú ===\n"
                         + "1. Agregar ejemplar\n"
                         + "2. Listar ejemplares de un libro\n"
                         + "3. Modificar estado\n"
                         + "0. Salir\n"
                         + "Opcion: ");
-                
+
                 String entrada = teclado.nextLine();
                 menu = Integer.parseInt(entrada);
 
@@ -37,14 +39,16 @@ public class ControladorEjemplar implements ControladorMenu {
                     case 0 ->
                         System.out.println("<--");
                     default ->
-                        System.out.println("El número ingresado es inválido");
+                        Mensaje.opcionInvalida();
                 }
 
             } catch (NumberFormatException e) {
-                System.out.println("Error: Tipo de dato incorrecto.");
+                Mensaje.tipoDatoIncorrecto();
             }
-            
-            Pausa.pausar();
+
+            if (menu != 0) {
+                Pausa.pausar();
+            }
         } while (menu != 0);
     }
 

@@ -2,6 +2,7 @@ package Controlador;
 
 import Gestor.GestorPrestamo;
 import herramientas.ControladorMenu;
+import herramientas.Mensaje;
 import herramientas.Pausa;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,7 +21,8 @@ public class ControladorPrestamo implements ControladorMenu {
 
         do {
             try {
-                System.out.print("=== Prestamo Menú ===\n"
+                System.out.print(
+                        "\n=== Prestamo Menú ===\n"
                         + "1. Registrar prestamo\n"
                         + "2. Registrar devolucion\n"
                         + "3. Listar prestamos\n"
@@ -40,14 +42,16 @@ public class ControladorPrestamo implements ControladorMenu {
                     case 0 ->
                         System.out.println("<--");
                     default ->
-                        System.out.println("El número ingresado es inválido");
+                        Mensaje.opcionInvalida();
                 }
 
             } catch (NumberFormatException e) {
-                System.out.println("Error: Tipo de dato incorrecto.");
+                Mensaje.tipoDatoIncorrecto();
             }
 
-            Pausa.pausar();
+            if (menu != 0) {
+                Pausa.pausar();
+            }
         } while (menu != 0);
     }
 

@@ -5,6 +5,7 @@ import Controlador.ControladorLibro;
 import Controlador.ControladorPrestamo;
 import Controlador.ControladorSocio;
 import herramientas.ControladorMenu;
+import herramientas.Mensaje;
 import herramientas.Pausa;
 import java.util.Scanner;
 import java.io.PrintStream;
@@ -55,9 +56,9 @@ public class SelectorMenu {
                         seleccion = menuPrestamo;
                     case 0 -> {
                         seleccion = null;
-                        System.out.println("Adios");}
+                        System.out.println("\n\nAdios\n\n");}
                     default ->
-                        System.out.println("El número ingresado es inválido");
+                        Mensaje.opcionInvalida();
                 }
 
                 if (seleccion != null) {
@@ -65,7 +66,7 @@ public class SelectorMenu {
                 }
 
             } catch (NumberFormatException e) {
-                System.out.println("Error: Tipo de dato incorrecto.");
+                Mensaje.tipoDatoIncorrecto();
             }
         } while (menu != 0);
     }
