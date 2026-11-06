@@ -5,11 +5,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 public class GestorSocio {
 // 4.1. Agregar socio
 
-    public void agregarSocio(String nombre, String dni, String telefono, String fechaAlta) {
+    public void agregarSocio(String nombre, String dni, String telefono, LocalDate fechaAlta) {
         String sql = "INSERT INTO SOCIO (nombre, DNI, telefono, fecha_alta) VALUES (?, ?, ?, ?)";
 
         // try-with-resources cierra el PreparedStatement y la conexión automáticamente
@@ -18,7 +19,7 @@ public class GestorSocio {
             ps.setString(1, nombre);
             ps.setString(2, dni);
             ps.setString(3, telefono);
-            ps.setString(4, fechaAlta); // Formato esperado por SQL: "YYYY-MM-DD"
+            ps.setDate(4, java.sql.Date.valueOf(fechaAlta)); // Formato esperado por SQL: "YYYY-MM-DD"
 
             ps.executeUpdate();
             System.out.println("¡Socio agregado exitosamente!");
@@ -107,16 +108,16 @@ public class GestorSocio {
     }
 
     // 4.5. Eliminar socio (Validando préstamos)
-    public void eliminarSocio(int idSocio) {
+    public void eliminarSocio(int dniSocio) {
         // Validación obligatoria: verificar si tiene préstamos activos
-        String sqlCheck = "SELECT COUNT(*) AS total FROM PRESTAMO WHERE id_socio = ?";
-        String sqlDelete = "DELETE FROM SOCIO WHERE id_socio = ?";
+        String sqlCheck = "SELECT COUNT(*) AS total FROM PRESTAMO WHERE DNI = ?";
+        String sqlDelete = "DELETE FROM SOCIO WHERE DNI = ?";
 
         try (Connection con = Conexion.getConexion()) {
 
             // 1. Verificamos los préstamos
             try (PreparedStatement psCheck = con.prepareStatement(sqlCheck)) {
-                psCheck.setInt(1, idSocio);
+                psCheck.setInt(1, dniSocio);
                 try (ResultSet rs = psCheck.executeQuery()) {
                     if (rs.next() && rs.getInt("total") > 0) {
                         System.out.println("Error: No se puede eliminar el socio porque tiene préstamos asociados.");
@@ -127,12 +128,12 @@ public class GestorSocio {
 
             // 2. Si no tiene préstamos, lo eliminamos
             try (PreparedStatement psDelete = con.prepareStatement(sqlDelete)) {
-                psDelete.setInt(1, idSocio);
+                psDelete.setInt(1, dniSocio);
                 int filas = psDelete.executeUpdate();
                 if (filas > 0) {
                     System.out.println("¡Socio eliminado exitosamente!");
                 } else {
-                    System.out.println("No se encontró un socio con el ID: " + idSocio);
+                    System.out.println("No se encontró un socio con el DNI: " + dniSocio);
                 }
             }
         } catch (SQLException e) {

@@ -2,6 +2,7 @@ package Controlador;
 
 import Gestor.GestorLibro;
 import herramientas.ControladorMenu;
+import herramientas.Pausa;
 import java.util.Scanner;
 
 public class ControladorLibro implements ControladorMenu {
@@ -23,8 +24,7 @@ public class ControladorLibro implements ControladorMenu {
                         + "5. Eliminar libro\n"
                         + "0. Salir\n"
                         + "Opcion: ");
-                
-                
+
                 menu = Integer.parseInt(teclado.nextLine());
 
                 switch (menu) {
@@ -38,12 +38,16 @@ public class ControladorLibro implements ControladorMenu {
                         pedirYModificarLibro();
                     case 5 ->
                         pedirYEliminarLibro();
+                    case 0 ->
+                        System.out.println("<--");
                     default ->
                         System.out.println("El número ingresado es inválido");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Error: Tipo de dato incorrecto.");
             }
+
+            Pausa.pausar();
         } while (menu != 0);
     }
 

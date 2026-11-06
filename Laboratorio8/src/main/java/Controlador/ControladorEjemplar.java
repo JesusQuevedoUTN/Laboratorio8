@@ -3,6 +3,7 @@ package Controlador;
 import Gestor.GestorEjemplar;
 import herramientas.ControladorMenu;
 import herramientas.Estado;
+import herramientas.Pausa;
 import java.util.Scanner;
 
 public class ControladorEjemplar implements ControladorMenu {
@@ -33,6 +34,8 @@ public class ControladorEjemplar implements ControladorMenu {
                         pedirYListarEjemplares();
                     case 3 ->
                         pedirYModificarEstado();
+                    case 0 ->
+                        System.out.println("<--");
                     default ->
                         System.out.println("El número ingresado es inválido");
                 }
@@ -40,6 +43,8 @@ public class ControladorEjemplar implements ControladorMenu {
             } catch (NumberFormatException e) {
                 System.out.println("Error: Tipo de dato incorrecto.");
             }
+            
+            Pausa.pausar();
         } while (menu != 0);
     }
 

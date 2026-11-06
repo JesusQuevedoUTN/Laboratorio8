@@ -2,6 +2,7 @@ package Controlador;
 
 import Gestor.GestorPrestamo;
 import herramientas.ControladorMenu;
+import herramientas.Pausa;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -11,7 +12,7 @@ public class ControladorPrestamo implements ControladorMenu {
 
     private GestorPrestamo gestor = new GestorPrestamo();
     private Scanner teclado = new Scanner(System.in);
-    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-mm-yyyy");
 
     @Override
     public void ejecutarMenu() {
@@ -25,10 +26,9 @@ public class ControladorPrestamo implements ControladorMenu {
                         + "3. Listar prestamos\n"
                         + "0. Salir\n"
                         + "Opcion: ");
-                
+
                 String entrada = teclado.nextLine();
                 menu = Integer.parseInt(entrada);
-
 
                 switch (menu) {
                     case 1 ->
@@ -37,6 +37,8 @@ public class ControladorPrestamo implements ControladorMenu {
                         pedirYRegistrarDevolucion();
                     case 3 ->
                         gestor.listarPrestamos();
+                    case 0 ->
+                        System.out.println("<--");
                     default ->
                         System.out.println("El número ingresado es inválido");
                 }
@@ -44,6 +46,8 @@ public class ControladorPrestamo implements ControladorMenu {
             } catch (NumberFormatException e) {
                 System.out.println("Error: Tipo de dato incorrecto.");
             }
+
+            Pausa.pausar();
         } while (menu != 0);
     }
 
@@ -58,10 +62,10 @@ public class ControladorPrestamo implements ControladorMenu {
             System.out.println("Ingrese el numero del ejemplar: ");
             int nro = Integer.parseInt(teclado.nextLine());
 
-            System.out.println("Ingrese la fecha del prestamo (dd/MM/yyyy): ");
+            System.out.println("Ingrese la fecha del prestamo (dd-mm-yyyy): ");
             LocalDate fechaP = LocalDate.parse(teclado.nextLine(), formato);
 
-            System.out.println("Ingrese la fecha limite del prestamo (dd/MM/yyyy): ");
+            System.out.println("Ingrese la fecha limite del prestamo (dd-mm-yyyy): ");
             LocalDate fechaPrev = LocalDate.parse(teclado.nextLine(), formato);
 
             gestor.registrarPrestamo(id, isbn, nro, fechaP, fechaPrev);
@@ -69,7 +73,7 @@ public class ControladorPrestamo implements ControladorMenu {
         } catch (NumberFormatException e) {
             System.out.println("Error: debe ingresar un numero entero.");
         } catch (DateTimeParseException e) {
-            System.out.println("Error: fecha invalida. Use el formato dd/MM/yyyy.");
+            System.out.println("Error: fecha invalida. Use el formato dd-mm-yyyy.");
         }
     }
 
@@ -78,7 +82,7 @@ public class ControladorPrestamo implements ControladorMenu {
             System.out.println("Ingrese el ID del prestamo: ");
             int id = Integer.parseInt(teclado.nextLine());
 
-            System.out.println("Ingrese la fecha de devolucion (dd/MM/yyyy): ");
+            System.out.println("Ingrese la fecha de devolucion (dd-mm-yyyy): ");
             LocalDate fechaDev = LocalDate.parse(teclado.nextLine(), formato);
 
             gestor.registrarDevolucion(id, fechaDev);
@@ -86,7 +90,7 @@ public class ControladorPrestamo implements ControladorMenu {
         } catch (NumberFormatException e) {
             System.out.println("Error: el ID debe ser un numero entero.");
         } catch (DateTimeParseException e) {
-            System.out.println("Error: fecha invalida. Use el formato dd/MM/yyyy.");
+            System.out.println("Error: fecha invalida. Use el formato dd-mm-yyyy.");
         }
     }
 }

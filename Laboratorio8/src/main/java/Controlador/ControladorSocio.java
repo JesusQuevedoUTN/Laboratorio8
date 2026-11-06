@@ -2,12 +2,16 @@ package Controlador;
 
 import Gestor.GestorSocio;
 import herramientas.ControladorMenu;
+import herramientas.Pausa;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class ControladorSocio implements ControladorMenu {
 
     private GestorSocio gestor = new GestorSocio();
     private Scanner teclado = new Scanner(System.in);
+    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-mm-yyyy");
 
     @Override
     public void ejecutarMenu() {
@@ -37,13 +41,17 @@ public class ControladorSocio implements ControladorMenu {
                         pedirYModificarSocio();
                     case 5 ->
                         pedirYEliminarSocio();
+                    case 0 ->
+                        System.out.println("<--");
                     default ->
                         System.out.println("El número ingresado es inválido");
                 }
-                
+
             } catch (NumberFormatException e) {
                 System.out.println("Error: Tipo de dato incorrecto.");
             }
+
+            Pausa.pausar();
         } while (menu != 0);
     }
 
@@ -54,8 +62,8 @@ public class ControladorSocio implements ControladorMenu {
         String dni = teclado.nextLine();
         System.out.print("Ingrese teléfono: ");
         String tel = teclado.nextLine();
-        System.out.print("Ingrese fecha de alta (YYYY-MM-DD): ");
-        String fecha = teclado.nextLine();
+        System.out.print("Ingrese fecha de alta (dd/MM/yyyy): ");
+        LocalDate fecha = LocalDate.parse(teclado.nextLine(), formato);
 
         gestor.agregarSocio(nombre, dni, tel, fecha);
     }
@@ -78,10 +86,10 @@ public class ControladorSocio implements ControladorMenu {
     }
 
     private void pedirYEliminarSocio() {
-        System.out.print("Ingrese el ID del socio a eliminar: ");
+        System.out.print("Ingrese el DNI del socio a eliminar: ");
         try {
-            int idEliminar = Integer.parseInt(teclado.nextLine());
-            gestor.eliminarSocio(idEliminar);
+            int dniEliminar = Integer.parseInt(teclado.nextLine());
+            gestor.eliminarSocio(dniEliminar);
         } catch (NumberFormatException e) {
             System.out.println("Error: El ID debe ser un número entero.");
         }
