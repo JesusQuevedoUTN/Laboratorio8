@@ -1,6 +1,7 @@
 package Gestor;
 
 import herramientas.Conexion;
+import herramientas.Estado;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,10 +9,16 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class GestorPrestamo {
-
+    
+    //
     //Revisar que esté bien
+    //
     
     public void registrarPrestamo(int idSocio, String isbn, int nroEjemplar, LocalDate fechaP, LocalDate fechaPrev) {
+        //
+        //que carajo es esto juan? asjajsjsa
+        //
+        
         String sqlUs = "SELECT id_socio FROM SOCIO WHERE id_socio = ?";
         String sqlLi = "SELECT ISBN FROM LIBRO WHERE ISBN = ?";
         String sqlEj = "SELECT estado FROM EJEMPLAR WHERE ISBN = ? AND nro_ejemplar = ?";
@@ -81,44 +88,61 @@ public class GestorPrestamo {
     }
 
     public void registrarDevolucion(int idPrestamo, LocalDate fechaDev) {
-        String sql1 = "SELECT fecha_devolucion_real, ISBN, nro_ejemplar FROM PRESTAMO WHERE id_prestamo = ?";
-        String sql2 = "UPDATE PRESTAMO SET fecha_devolucion_real = ? WHERE id_prestamo = ?";
-        String sql3 = "UPDATE EJEMPLAR SET estado = ? WHERE ISBN = ? AND nro_ejemplar = ?";
+
+        //Datos
+        String sqlDatos
+                = "SELECT fecha_devolucion_real, ISBN, nro_ejemplar FROM PRESTAMO \n"
+                + "WHERE id_prestamo = ?";
+
+        //Actualizar
+        String sqlActualizarPrestamo
+                = "UPDATE PRESTAMO SET fecha_devolucion_real = ? \n"
+                + "WHERE id_prestamo = ?";
+        String sqlActualizarEjemplar
+                = "UPDATE EJEMPLAR SET estado = ? \n"
+                + "WHERE ISBN = ? AND nro_ejemplar = ?";
 
         try (Connection con = Conexion.getConexion()) {
             String isbn;
             int nro;
+            boolean sePuedeSeguir = true;
 
-            // 1 y 2: buscar el préstamo y verificar que no esté devuelto
-            try (PreparedStatement ps1 = con.prepareStatement(sql1)) {
-                ps1.setInt(1, idPrestamo);
-                try (ResultSet rs = ps1.executeQuery()) {
-                    if (!rs.next()) {
+            // buscar el préstamo 
+            try (PreparedStatement instruccionBusquedaDeDatos = con.prepareStatement(sqlDatos)) {
+                instruccionBusquedaDeDatos.setInt(1, idPrestamo);
+
+                // verificar que no esté devuelto
+                try (ResultSet consultaDatos = instruccionBusquedaDeDatos.executeQuery()) {
+                    if (!consultaDatos.next()) {
                         System.out.println("Error: ID de préstamo no encontrado.");
-                        return;
+                        sePuedeSeguir = false;
                     }
-                    if (rs.getDate("fecha_devolucion_real") != null) {
+                    if (consultaDatos.getDate("fecha_devolucion_real") != null && sePuedeSeguir) {
                         System.out.println("Aviso: Este prestamo ya fue devuelto previamente.");
-                        return;
+                        sePuedeSeguir = false;
                     }
-                    isbn = rs.getString("ISBN");
-                    nro = rs.getInt("nro_ejemplar");
+
+                    isbn = consultaDatos.getString("ISBN");
+                    nro = consultaDatos.getInt("nro_ejemplar");
                 }
             }
 
-            // 3: registrar la fecha de devolución y dejar el ejemplar como Disponible
-            try (PreparedStatement ps2 = con.prepareStatement(sql2); PreparedStatement ps3 = con.prepareStatement(sql3)) {
+            if (sePuedeSeguir) {
+                // Actualizar Datos
+                try (PreparedStatement instruccionActualizarPrestamos = con.prepareStatement(sqlActualizarPrestamo); PreparedStatement instruccionActualizarEjemplar = con.prepareStatement(sqlActualizarEjemplar)) {
+                    instruccionActualizarPrestamos.setDate(1, java.sql.Date.valueOf(fechaDev));
+                    instruccionActualizarPrestamos.setInt(2, idPrestamo);
+                    instruccionActualizarEjemplar.setString(1, Estado.Disponible.name());
+                    instruccionActualizarEjemplar.setString(2, isbn);
+                    instruccionActualizarEjemplar.setInt(3, nro);
 
-                ps2.setDate(1, java.sql.Date.valueOf(fechaDev));
-                ps2.setInt(2, idPrestamo);
-                ps2.executeUpdate();
+                    // Ejecutamos
+                    instruccionActualizarPrestamos.executeUpdate();
+                    instruccionActualizarEjemplar.executeUpdate();
 
-                ps3.setString(1, "Disponible");
-                ps3.setString(2, isbn);
-                ps3.setInt(3, nro);
-                ps3.executeUpdate();
+                    System.out.println("¡Devolucion exitosa! El ejemplar vuelve a estar disponible.");
+                }
 
-                System.out.println("¡Devolucion exitosa! El ejemplar vuelve a estar disponible.");
             }
 
         } catch (SQLException e) {
@@ -128,7 +152,7 @@ public class GestorPrestamo {
 
     public void listarPrestamos() {
 
-        String sql 
+        String sql
                 = "SELECT p.id_prestamo, s.nombre, l.titulo, p.fecha_prestamo "
                 + "FROM PRESTAMO p "
                 + "JOIN SOCIO s ON p.id_socio = s.id_socio "
@@ -137,21 +161,21 @@ public class GestorPrestamo {
         try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql); ResultSet consulta = instruccion.executeQuery()) {
 
             System.out.printf(
-                "%-8s %-25s %-35s %-15s%n",
-                "ID", "SOCIO", "LIBRO", "FECHA");
-        System.out.println("-------------------------------------------------------------------------------------");
+                    "%-8s %-25s %-35s %-15s%n",
+                    "ID", "SOCIO", "LIBRO", "FECHA");
+            System.out.println("-------------------------------------------------------------------------------------");
 
-        while (consulta.next()) {
-            int idP = consulta.getInt("id_prestamo");
-            String nom = consulta.getString("nombre");
-            String titu = consulta.getString("titulo");
-            LocalDate fechaP = consulta.getDate("fecha_prestamo").toLocalDate();
+            while (consulta.next()) {
+                int idP = consulta.getInt("id_prestamo");
+                String nom = consulta.getString("nombre");
+                String titu = consulta.getString("titulo");
+                LocalDate fechaP = consulta.getDate("fecha_prestamo").toLocalDate();
 
-            System.out.printf(
-                    "%-8d %-25s %-35s %-15s%n",
-                    idP, nom, titu, fechaP);
-        }
-        System.out.println();
+                System.out.printf(
+                        "%-8d %-25s %-35s %-15s%n",
+                        idP, nom, titu, fechaP);
+            }
+            System.out.println();
 
         } catch (SQLException e) {
             System.out.println("Error al listar prestamos: " + e.getMessage());

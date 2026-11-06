@@ -63,16 +63,16 @@ public class GestorEjemplar {
                 = "UPDATE EJEMPLAR SET estado = ?"
                 + "WHERE ISBN = ? AND nro_ejemplar = ?";
 
-        try (Connection con = Conexion.getConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
 
-            ps.setString(1, estado);
-            ps.setString(2, isbn);
-            ps.setInt(3, nro);
+            instruccion.setString(1, estado);
+            instruccion.setString(2, isbn);
+            instruccion.setInt(3, nro);
 
-            int filas = ps.executeUpdate();
+            int filas = instruccion.executeUpdate();
 
             if (filas > 0) {
-                System.out.println("Estado actualizado ");
+                System.out.println("Estado actualizado");
             } else {
                 System.out.println("No se pudo cambiar: el ejemplar no existe o no estaba ");
             }
