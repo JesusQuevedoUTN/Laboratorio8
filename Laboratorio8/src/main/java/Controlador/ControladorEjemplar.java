@@ -37,7 +37,7 @@ public class ControladorEjemplar implements ControladorMenu {
                     case 3 ->
                         pedirYModificarEstado();
                     case 0 ->
-                        System.out.println("<--");
+                        System.out.println("<--\n\n");
                     default ->
                         Mensaje.opcionInvalida();
                 }

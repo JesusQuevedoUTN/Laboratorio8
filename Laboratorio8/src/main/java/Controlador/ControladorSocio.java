@@ -44,7 +44,7 @@ public class ControladorSocio implements ControladorMenu {
                     case 5 ->
                         pedirYEliminarSocio();
                     case 0 ->
-                        System.out.println("<--");
+                        System.out.println("<--\n\n");
                     default ->
                         Mensaje.opcionInvalida();
                 }

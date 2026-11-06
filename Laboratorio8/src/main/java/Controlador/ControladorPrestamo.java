@@ -40,7 +40,7 @@ public class ControladorPrestamo implements ControladorMenu {
                     case 3 ->
                         gestor.listarPrestamos();
                     case 0 ->
-                        System.out.println("<--");
+                        System.out.println("<--\n\n");
                     default ->
                         Mensaje.opcionInvalida();
                 }
