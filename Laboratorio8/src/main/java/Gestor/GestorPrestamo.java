@@ -13,7 +13,7 @@ public class GestorPrestamo implements GestorMenu {
 
     private ControladorPrestamo gestor = new ControladorPrestamo();
     private Scanner teclado = new Scanner(System.in);
-    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("d-M-yyy");
+    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("d-M-yyyy");
 
     @Override
     public void ejecutarMenu() {
@@ -56,6 +56,7 @@ public class GestorPrestamo implements GestorMenu {
     }
 
     private void pedirYRegistrarPrestamo() {
+        
         try {
             System.out.println("Ingrese el id del socio: ");
             int id = Integer.parseInt(teclado.nextLine());
@@ -67,12 +68,16 @@ public class GestorPrestamo implements GestorMenu {
             int nro = Integer.parseInt(teclado.nextLine());
 
             System.out.println("Ingrese la fecha del prestamo (dia-mes-año): ");
-            LocalDate fechaP = LocalDate.parse(teclado.nextLine(), formato);
+            LocalDate fechaPrestamo = LocalDate.parse(teclado.nextLine(), formato);
 
             System.out.println("Ingrese la fecha limite del prestamo (dia-mes-año): ");
-            LocalDate fechaPrev = LocalDate.parse(teclado.nextLine(), formato);
+            LocalDate fechaLimite = LocalDate.parse(teclado.nextLine(), formato);
 
-            gestor.registrarPrestamo(id, isbn, nro, fechaP, fechaPrev);
+            if (fechaLimite.isBefore(fechaPrestamo)) {
+                System.out.println("Error: La fecha límite no puede ser anterior a la fecha del préstamo.");
+            } else {
+                gestor.registrarPrestamo(id, isbn, nro, fechaPrestamo, fechaLimite);
+            }
 
         } catch (NumberFormatException e) {
             System.out.println("Error: debe ingresar un numero entero.");

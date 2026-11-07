@@ -5,6 +5,7 @@ import herramientas.Mensaje;
 import herramientas.Pausa;
 import java.util.Scanner;
 import herramientas.GestorMenu;
+import java.time.LocalDate;
 
 public class GestorLibro implements GestorMenu {
 
@@ -56,18 +57,35 @@ public class GestorLibro implements GestorMenu {
     }
 
     private void pedirYAgregarLibro() {
+
         System.out.println("Ingrese ISBN: ");
         String isbn = teclado.nextLine();
+
         System.out.println("Ingrese titulo: ");
         String titulo = teclado.nextLine();
+
         System.out.println("Ingrese autor: ");
         String autor = teclado.nextLine();
+
         System.out.println("Ingrese editorial: ");
         String editorial = teclado.nextLine();
-        System.out.println("Ingrese anio de publicacion: ");
-        int anio = Integer.parseInt(teclado.nextLine());
 
-        gestor.agregarLibro(isbn, titulo, autor, editorial, anio);
+        if (titulo.isBlank() || autor.isBlank() || editorial.isBlank()) {
+            System.out.println("No se admiten datos varíos");
+        } else {
+
+            System.out.println("Ingrese anio de publicacion: ");
+            int anio = Integer.parseInt(teclado.nextLine());
+
+            if (anio <= 0 || anio > LocalDate.now().getYear()) {
+                System.out.println("Error: Año de publicación inválido.");
+            } else {
+                gestor.agregarLibro(isbn, titulo, autor, editorial, anio);
+
+            }
+
+        }
+
     }
 
     private void pedirYBuscarLibro() {
@@ -77,18 +95,35 @@ public class GestorLibro implements GestorMenu {
     }
 
     private void pedirYModificarLibro() {
-        System.out.println("Ingrese el ISBN a modificar: ");
-        String isbn = teclado.nextLine();
-        System.out.println("Ingrese nuevo titulo: ");
-        String titulo = teclado.nextLine();
-        System.out.println("Ingrese nuevo autor: ");
-        String autor = teclado.nextLine();
-        System.out.println("Ingrese nueva editorial: ");
-        String editorial = teclado.nextLine();
-        System.out.println("Ingrese nuevo anio: ");
-        int anio = Integer.parseInt(teclado.nextLine());
 
-        gestor.modificarLibro(isbn, titulo, autor, editorial, anio);
+        System.out.println("Ingrese ISBN: ");
+        String isbn = teclado.nextLine();
+
+        System.out.println("Ingrese titulo: ");
+        String titulo = teclado.nextLine();
+
+        System.out.println("Ingrese autor: ");
+        String autor = teclado.nextLine();
+
+        System.out.println("Ingrese editorial: ");
+        String editorial = teclado.nextLine();
+
+        if (titulo.isBlank() || autor.isBlank() || editorial.isBlank()) {
+            System.out.println("No se admiten datos varíos");
+        } else {
+
+            System.out.println("Ingrese anio de publicacion: ");
+            int anio = Integer.parseInt(teclado.nextLine());
+
+            if (anio <= 0 || anio > LocalDate.now().getYear()) {
+                System.out.println("Error: Año de publicación inválido.");
+            } else {
+                gestor.modificarLibro(isbn, titulo, autor, editorial, anio);
+
+            }
+
+        }
+
     }
 
     private void pedirYEliminarLibro() {
@@ -96,4 +131,6 @@ public class GestorLibro implements GestorMenu {
         String isbn = teclado.nextLine();
         gestor.eliminarLibro(isbn);
     }
+
 }
+

@@ -13,7 +13,7 @@ public class GestorSocio implements GestorMenu {
 
     private ControladorSocio gestor = new ControladorSocio();
     private Scanner teclado = new Scanner(System.in);
-    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("d-M-yyy");
+    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("d-M-yyyy");
 
     @Override
     public void ejecutarMenu() {
@@ -71,10 +71,14 @@ public class GestorSocio implements GestorMenu {
             System.out.print("Ingrese teléfono: ");
             String tel = teclado.nextLine();
 
-            System.out.print("Ingrese fecha de alta (dia-mes-año): ");
-            LocalDate fecha = LocalDate.parse(teclado.nextLine(), formato);
+            if (nombre.isBlank() || dni.isBlank() || tel.isBlank()) {
+                System.out.println("Error: Los campos no pueden estar vacíos.");
+            } else {
+                System.out.print("Ingrese fecha de alta (dia-mes-año): ");
+                LocalDate fecha = LocalDate.parse(teclado.nextLine(), formato);
 
-            gestor.agregarSocio(nombre, dni, tel, fecha);
+                gestor.agregarSocio(nombre, dni, tel, fecha);
+            }
 
         } catch (DateTimeParseException e) {
             System.out.println("Error: Fecha inválida. Utilice dd-MM-yyyy.");
