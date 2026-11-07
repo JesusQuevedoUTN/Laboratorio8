@@ -53,33 +53,44 @@ public class GestorEjemplar implements GestorMenu {
     }
 
     private void pedirYAgregarEjemplar() {
+        
         System.out.println("Ingres ISBN: ");
         String isbn = teclado.nextLine();
+        
         System.out.println("Ingrese nro de ejemplar: ");
         int nro = Integer.parseInt(teclado.nextLine());
+        
         System.out.println("Que estado quiere darle al ejemplar [1:Disponible|2:Prestado]: ");
+        
         int estado = Integer.parseInt(teclado.nextLine());
-        if (estado == 1) {
-            gestor.agregarEjemplar(isbn, nro, Estado.Disponible.name());
-        } else {
-
-            gestor.agregarEjemplar(isbn, nro, Estado.Prestado.name());
+        switch (estado) {
+            case 1 ->
+                gestor.agregarEjemplar(isbn, nro, Estado.Disponible.name());
+            case 2 ->
+                gestor.agregarEjemplar(isbn, nro, Estado.Prestado.name());
+            default ->
+                System.out.println("Error: Estado inválido.");
         }
     }
 
     private void pedirYModificarEstado() {
+        
         System.out.println("Ingrese el ISBN del Ejemplar a Buscar:");
         String isbn = teclado.nextLine();
+        
         System.out.println("Ingrese nro de ejemplar: ");
+        
         int nro = Integer.parseInt(teclado.nextLine());
         System.out.println("Que estado quiere darle al ejemplar [1:Disponible|2:Prestado]: ");
+        
         int estado = Integer.parseInt(teclado.nextLine());
-
-        if (estado == 1) {
-            gestor.modificarEstado(isbn, nro, Estado.Disponible.name());
-        } else {
-
-            gestor.modificarEstado(isbn, nro, Estado.Prestado.name());
+        switch (estado) {
+            case 1 ->
+                gestor.agregarEjemplar(isbn, nro, Estado.Disponible.name());
+            case 2 ->
+                gestor.agregarEjemplar(isbn, nro, Estado.Prestado.name());
+            default ->
+                System.out.println("Error: Estado inválido.");
         }
     }
 
