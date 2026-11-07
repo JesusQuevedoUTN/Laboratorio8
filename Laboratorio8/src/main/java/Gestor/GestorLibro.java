@@ -134,11 +134,8 @@ public class GestorLibro implements GestorMenu {
         String titulo = gestor.buscarTitulo(isbn);
         
         if(titulo != null){
-        System.out.println("Estas seguro de que queres borrar el libro: " + titulo + " ? [1:SI/2:NO]");
+        System.out.println("Estas seguro de que queres borrar el libro: " + titulo + " ? [1 para SI || otro numero para NO]");
         respuesta = Integer.parseInt(teclado.nextLine());
-        if(respuesta < 1 || respuesta > 2){
-            System.out.println("Respuesta invalida");
-        }
         if (respuesta == 1) {
             gestor.eliminarLibro(isbn);
             
