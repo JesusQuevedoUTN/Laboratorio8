@@ -129,7 +129,18 @@ public class GestorLibro implements GestorMenu {
     private void pedirYEliminarLibro() {
         System.out.println("Ingrese el ISBN a eliminar: ");
         String isbn = teclado.nextLine();
-        gestor.eliminarLibro(isbn);
+        
+        String titulo = gestor.buscarTitulo(isbn);
+        
+        
+        /*System.out.println("Estas seguro de que queres borrar: " libro);
+        if (si) {
+            gestor.eliminarLibro(isbn);
+            
+        }else{
+            System.out.println("No se borro: " libro);
+        }*/
+        
     }
 
 }

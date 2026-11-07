@@ -5,7 +5,6 @@ import Gestor.GestorLibro;
 import Gestor.GestorPrestamo;
 import Gestor.GestorSocio;
 import herramientas.Mensaje;
-import herramientas.Pausa;
 import java.util.Scanner;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -44,7 +43,6 @@ public class SelectorMenu {
 
                 menu = Integer.parseInt(teclado.nextLine());
 
-                //FALTA QUE AL ENTRAR EN UN MENU Y SALIR, SALGA DE UNA, HAY UN ERROR ACÁ
                 switch (menu) {
                     case 1 ->
                         seleccion = menuLibro;

@@ -32,7 +32,7 @@ public class ControladorLibro {
         String sql
                 = "SELECT ISBN, titulo, autor, editorial, anio_publicacion\n"
                 + "FROM LIBRO\n"
-                + "ORDER BY ISBN ASC;";
+                + "ORDER BY ISBN ASC";
 
         try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql); ResultSet consulta = instruccion.executeQuery()) {
             System.out.printf(
@@ -61,14 +61,14 @@ public class ControladorLibro {
         String sql = "SELECT * FROM LIBRO WHERE ISBN = ?";
         try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
             instruccion.setString(1, isbn);
-            try (ResultSet rs = instruccion.executeQuery()) {
-                if (rs.next()) {
+            try (ResultSet consulta = instruccion.executeQuery()) {
+                if (consulta.next()) {
                     System.out.println("\n--- Libro Encontrado ---");
                     System.out.println("ISBN: " + isbn);
-                    System.out.println("Titulo: " + rs.getString("titulo"));
-                    System.out.println("Autor: " + rs.getString("autor"));
-                    System.out.println("Editorial: " + rs.getString("editorial"));
-                    System.out.println("Anio de publicacion: " + rs.getInt("anio_publicacion"));
+                    System.out.println("Titulo: " + consulta.getString("titulo"));
+                    System.out.println("Autor: " + consulta.getString("autor"));
+                    System.out.println("Editorial: " + consulta.getString("editorial"));
+                    System.out.println("Anio de publicacion: " + consulta.getInt("anio_publicacion"));
                     System.out.println("--------------------------\n");
                 } else {
                     System.out.println("Libro no encontrado");
@@ -118,6 +118,28 @@ public class ControladorLibro {
         } catch (SQLException e) {
             System.out.println("Error al eliminar libro: " + e.getMessage());
         }
+    }
+
+    public String buscarTitulo(String isbn) {
+        String titulo = null;
+        String sql = "SELECT * FROM LIBRO WHERE ISBN = ?";
+
+        //CREO QUE NO HACE FALTA SELECT * PORQUE SOLO BUSCA 1
+        
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+            instruccion.setString(1, isbn);
+            try (ResultSet consulta = instruccion.executeQuery()) {
+                if (consulta.next()) {
+                    titulo = consulta.getString("titulo");
+                } else {
+                    System.out.println("Libro no encontrado");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al buscar libro: " + e.getMessage());
+        }
+        
+        return titulo;
     }
 
 }

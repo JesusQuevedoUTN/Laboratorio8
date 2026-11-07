@@ -101,9 +101,10 @@ public class GestorEjemplar implements GestorMenu {
         ISBN = teclado.nextLine();
         if (ISBN == null || ISBN.isEmpty()) {
             throw new IllegalArgumentException("El ISBN no puede estar vacío.");
+        }else {
+            gestor.listarEjemplares(ISBN);
         }
 
-        gestor.listarEjemplares(ISBN);
     }
 
 }
