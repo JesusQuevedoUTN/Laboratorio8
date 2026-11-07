@@ -1,101 +1,168 @@
 package Controlador;
 
-import Gestor.GestorSocio;
-import herramientas.ControladorMenu;
-import herramientas.Mensaje;
-import herramientas.Pausa;
+import herramientas.Conexion;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
 
-public class ControladorSocio implements ControladorMenu {
+public class ControladorSocio {
 
-    private GestorSocio gestor = new GestorSocio();
-    private Scanner teclado = new Scanner(System.in);
-    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-mm-yyyy");
+    // 4.1. Agregar socio
+    public void agregarSocio(String nombre, String dni, String telefono, LocalDate fechaAlta) {
+        String sql
+                = "INSERT INTO SOCIO (nombre, DNI, telefono, fecha_alta) \n"
+                + "VALUES (?, ?, ?, ?)";
 
-    @Override
-    public void ejecutarMenu() {
-        int menu = -1;
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
 
-        do {
-            try {
-                System.out.print(
-                        "\n=== Socios Menú ===\n"
-                        + "1. Agregar socio\n"
-                        + "2. Listar socios\n"
-                        + "3. Buscar socio\n"
-                        + "4. Modificar socio\n"
-                        + "5. Eliminar socio\n"
-                        + "0. Volver al menú principal\n"
-                        + "Opción: ");
+            instruccion.setString(1, nombre);
+            instruccion.setString(2, dni);
+            instruccion.setString(3, telefono);
+            instruccion.setDate(4, java.sql.Date.valueOf(fechaAlta)); // Formato esperado por SQL: "YYYY-MM-DD"
 
-                menu = Integer.parseInt(teclado.nextLine());
+            instruccion.executeUpdate();
+            System.out.println("Socio agregado correctamente");
 
-                switch (menu) {
-                    case 1 ->
-                        pedirYAgregarSocio();
-                    case 2 ->
-                        gestor.listarSocios();
-                    case 3 ->
-                        pedirYBuscarSocio();
-                    case 4 ->
-                        pedirYModificarSocio();
-                    case 5 ->
-                        pedirYEliminarSocio();
-                    case 0 ->
-                        System.out.println("<--\n\n");
-                    default ->
-                        Mensaje.opcionInvalida();
+        } catch (SQLException e) {
+            System.out.println("Error al agregar socio (¿DNI duplicado?): " + e.getMessage());
+        }
+    }
+
+    // 4.2. Listar socios
+    public void listarSocios() {
+        String sql
+                = "SELECT id_socio, nombre, DNI, telefono FROM SOCIO \n"
+                + "ORDER BY id_socio ASC";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql); ResultSet consulta = instruccion.executeQuery()) {
+
+            System.out.printf(
+                    "%-5s %-25s %-15s %-15s%n",
+                    "ID", "NOMBRE", "DNI", "TELÉFONO");
+            System.out.println(
+                    "---------------------------------------------------------");
+
+            while (consulta.next()) {
+                int id = consulta.getInt("id_socio");
+                String nombre = consulta.getString("nombre");
+                String dni = consulta.getString("DNI");
+                String telefono = consulta.getString("telefono");
+
+                System.out.printf(
+                        "%-5d %-25s %-15s %-15s\n",
+                        id, nombre, dni, telefono);
+            }
+            System.out.println();
+
+        } catch (SQLException e) {
+            System.out.println("Error al listar socios: " + e.getMessage());
+        }
+    }
+
+    // 4.3. Buscar socio por DNI
+    public void buscarSocioPorDni(String dniBuscado) {
+        String sql
+                = "SELECT id_socio, nombre, DNI, telefono, fecha_alta FROM SOCIO \n"
+                + "WHERE DNI = ?";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+
+            instruccion.setString(1, dniBuscado);
+
+            try (ResultSet consulta = instruccion.executeQuery()) {
+                if (consulta.next()) {
+                    int id = consulta.getInt("id_socio");
+                    String nombre = consulta.getString("nombre");
+                    String dni = consulta.getString("DNI");
+                    String telefono = consulta.getString("telefono");
+                    String fechaAlta = consulta.getString("fecha_alta");
+
+                    System.out.println("\n--- ¡Socio Encontrado! ---");
+                    System.out.println("ID: " + id);
+                    System.out.println("Nombre: " + nombre);
+                    System.out.println("DNI: " + dni);
+                    System.out.println("Teléfono: " + telefono);
+                    System.out.println("Fecha de Alta: " + fechaAlta);
+                    System.out.println("--------------------------\n");
+                } else {
+                    System.out.println("No se encontró un socio con el DNI: " + dniBuscado);
                 }
-
-            } catch (NumberFormatException e) {
-                Mensaje.tipoDatoIncorrecto();
             }
 
-            if (menu != 0) {
-                Pausa.pausar();
+        } catch (SQLException e) {
+            System.out.println("Error al buscar socio: " + e.getMessage());
+        }
+    }
+
+    // 4.4. Modificar socio (Solo Nombre y Teléfono)
+    public void modificarSocio(String dni, String nuevoNombre, String nuevoTelefono) {
+        String sql
+                = "UPDATE SOCIO SET nombre = ?, telefono = ? \n"
+                + "WHERE DNI = ?";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+
+            instruccion.setString(1, nuevoNombre);
+            instruccion.setString(2, nuevoTelefono);
+            instruccion.setString(3, dni);
+
+            int filas = instruccion.executeUpdate();
+            if (filas > 0) {
+                System.out.println("¡Socio modificado correctamente!");
+            } else {
+                System.out.println("No se encontró un socio con el DNI: " + dni);
             }
-        } while (menu != 0);
+        } catch (SQLException e) {
+            System.out.println("Error al modificar socio: " + e.getMessage());
+        }
     }
 
-    private void pedirYAgregarSocio() {
-        System.out.print("Ingrese nombre: ");
-        String nombre = teclado.nextLine();
-        System.out.print("Ingrese DNI: ");
-        String dni = teclado.nextLine();
-        System.out.print("Ingrese teléfono: ");
-        String tel = teclado.nextLine();
-        System.out.print("Ingrese fecha de alta (dd-mm-yyyy): ");
-        LocalDate fecha = LocalDate.parse(teclado.nextLine(), formato);
+    // 4.5. Eliminar socio (Validando préstamos)
+    public void eliminarSocio(int idSocio) {
+        // Validación obligatoria: verificar si tiene préstamos activos
+        String sqlPrestamos
+                = "SELECT COUNT(*) AS total FROM PRESTAMO \n"
+                + "WHERE id_socio = ?";
 
-        gestor.agregarSocio(nombre, dni, tel, fecha);
-    }
+        String sqlSocioABorrar
+                = "DELETE FROM SOCIO \n"
+                + "WHERE id_socio = ?";
 
-    private void pedirYBuscarSocio() {
-        System.out.print("Ingrese el DNI a buscar: ");
-        String dni = teclado.nextLine();
-        gestor.buscarSocioPorDni(dni);
-    }
+        //Conexion
+        try (Connection con = Conexion.getConexion()) {
 
-    private void pedirYModificarSocio() {
-        System.out.print("Ingrese el DNI del socio a modificar: ");
-        String dniModificar = teclado.nextLine();
-        System.out.print("Ingrese el nuevo nombre: ");
-        String nuevoNombre = teclado.nextLine();
-        System.out.print("Ingrese el nuevo teléfono: ");
-        String nuevoTelefono = teclado.nextLine();
+            boolean sePuedeEliminar = true;
 
-        gestor.modificarSocio(dniModificar, nuevoNombre, nuevoTelefono);
-    }
+            // Consultamos la tabla de prestamos completa
+            try (PreparedStatement instruccionPrestamos = con.prepareStatement(sqlPrestamos)) {
+                instruccionPrestamos.setInt(1, idSocio);
+                
+                // Verificamos si tiene préstamos                
+                try (ResultSet consulta = instruccionPrestamos.executeQuery()) {
+                    if (consulta.next() && consulta.getInt("total") > 0) {
+                        System.out.println("Error: No se puede eliminar el socio porque tiene préstamos asociados.");
+                        sePuedeEliminar = false;
+                    }
+                }
+            }
 
-    private void pedirYEliminarSocio() {
-        System.out.print("Ingrese el DNI del socio a eliminar: ");
-        try {
-            int dniEliminar = Integer.parseInt(teclado.nextLine());
-            gestor.eliminarSocio(dniEliminar);
-        } catch (NumberFormatException e) {
-            System.out.println("Error: El DNI debe ser un número entero.");
+            if (sePuedeEliminar) {
+                try (PreparedStatement instruccionesSocioABorrar = con.prepareStatement(sqlSocioABorrar)) {
+                    instruccionesSocioABorrar.setInt(1, idSocio);
+                    int filas = instruccionesSocioABorrar.executeUpdate();
+
+                    if (filas > 0) {
+                        System.out.println("¡Socio eliminado exitosamente!");
+                    } else {
+                        System.out.println("No se encontró un socio con el DNI: " + idSocio);
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error al eliminar socio: " + e.getMessage());
         }
     }
 }

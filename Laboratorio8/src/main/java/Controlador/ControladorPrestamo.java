@@ -1,100 +1,190 @@
 package Controlador;
 
-import Gestor.GestorPrestamo;
-import herramientas.ControladorMenu;
-import herramientas.Mensaje;
-import herramientas.Pausa;
+import herramientas.Conexion;
+import herramientas.Estado;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Scanner;
 
-public class ControladorPrestamo implements ControladorMenu {
+public class ControladorPrestamo {
 
-    private GestorPrestamo gestor = new GestorPrestamo();
-    private Scanner teclado = new Scanner(System.in);
-    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-mm-yyyy");
+    public void registrarPrestamo(int idSocio, String isbn, int nroEjemplar, LocalDate fechaP, LocalDate fechaPrev) {
 
-    @Override
-    public void ejecutarMenu() {
-        int menu = -1;
+        boolean sePuedeSeguir = true;
 
-        do {
-            try {
-                System.out.print(
-                        "\n=== Prestamo Menú ===\n"
-                        + "1. Registrar prestamo\n"
-                        + "2. Registrar devolucion\n"
-                        + "3. Listar prestamos\n"
-                        + "0. Salir\n"
-                        + "Opcion: ");
+        //Conectar
+        try (Connection con = Conexion.getConexion()) {
+            
+            // Buscar Socio
+            String sqlSocio = "SELECT id_socio FROM SOCIO WHERE id_socio = ?";
+            try (PreparedStatement buscarSocio = con.prepareStatement(sqlSocio)) {
+                buscarSocio.setInt(1, idSocio);
 
-                String entrada = teclado.nextLine();
-                menu = Integer.parseInt(entrada);
+                try (ResultSet consultaSocio = buscarSocio.executeQuery()) {
+                    if (!consultaSocio.next()) {
+                        System.out.println("Error: Socio no encontrado en la base de datos.");
+                        sePuedeSeguir = false;
+                    }
+                }
+            }
 
-                switch (menu) {
-                    case 1 ->
-                        pedirYRegistrarPrestamo();
-                    case 2 ->
-                        pedirYRegistrarDevolucion();
-                    case 3 ->
-                        gestor.listarPrestamos();
-                    case 0 ->
-                        System.out.println("<--\n\n");
-                    default ->
-                        Mensaje.opcionInvalida();
+            if (sePuedeSeguir) {
+
+                // Buscar Libro
+                String sqlLibro = "SELECT ISBN FROM LIBRO WHERE ISBN = ?";
+                try (PreparedStatement buscarLibro = con.prepareStatement(sqlLibro)) {
+                    buscarLibro.setString(1, isbn);
+                    try (ResultSet consultaLibro = buscarLibro.executeQuery()) {
+                        if (!consultaLibro.next()) {
+                            System.out.println("Error: ISBN no encontrado en la base de datos.");
+                            sePuedeSeguir = false;
+                        }
+                    }
                 }
 
-            } catch (NumberFormatException e) {
-                Mensaje.tipoDatoIncorrecto();
+                if (sePuedeSeguir) {
+                    // Buscar el Ejemplar del Libro
+                    String sqlEjemplar = "SELECT estado FROM EJEMPLAR WHERE ISBN = ? AND nro_ejemplar = ?";
+                    try (PreparedStatement buscarEjemplar = con.prepareStatement(sqlEjemplar)) {
+                        buscarEjemplar.setString(1, isbn);
+                        buscarEjemplar.setInt(2, nroEjemplar);
+
+                        // Revisar que esté disponible
+                        try (ResultSet consultaEjemplar = buscarEjemplar.executeQuery()) {
+                            if (!consultaEjemplar.next()) {
+                                System.out.println("Error: Numero de ejemplar no encontrado.");
+                                return;
+                            }
+                            if (!consultaEjemplar.getString("estado").equals(Estado.Disponible.name())) {
+                                System.out.println("Error: El ejemplar no está disponible para préstamo.");
+                                sePuedeSeguir = false;
+                            }
+                        }
+                    }
+
+                    if (sePuedeSeguir) {
+                        //Esta todo bien, registrar Préstamo 
+                        String sqlPrestamo = "INSERT INTO PRESTAMO (id_socio, ISBN, nro_ejemplar, fecha_prestamo, fecha_devolucion_prevista) VALUES (?, ?, ?, ?, ?)";
+                        String sqlActualizar = "UPDATE EJEMPLAR SET estado = 'Prestado' WHERE ISBN = ? AND nro_ejemplar = ?";
+                        try (PreparedStatement registrarPrestamo = con.prepareStatement(sqlPrestamo); PreparedStatement actualizarEjemplar = con.prepareStatement(sqlActualizar)) {
+
+                            registrarPrestamo.setInt(1, idSocio);
+                            registrarPrestamo.setString(2, isbn);
+                            registrarPrestamo.setInt(3, nroEjemplar);
+                            registrarPrestamo.setDate(4, java.sql.Date.valueOf(fechaP));
+                            registrarPrestamo.setDate(5, java.sql.Date.valueOf(fechaPrev));
+
+                            actualizarEjemplar.setString(1, isbn);
+                            actualizarEjemplar.setInt(2, nroEjemplar);
+
+                            registrarPrestamo.executeUpdate();
+                            actualizarEjemplar.executeUpdate();
+
+                            System.out.println("¡Prestamo registrado con éxito!");
+                        }
+                    }
+                }
             }
 
-            if (menu != 0) {
-                Pausa.pausar();
-            }
-        } while (menu != 0);
-    }
-
-    private void pedirYRegistrarPrestamo() {
-        try {
-            System.out.println("Ingrese el ID del usuario: ");
-            int id = Integer.parseInt(teclado.nextLine());
-
-            System.out.println("Ingrese el ISBN del libro: ");
-            String isbn = teclado.nextLine();
-
-            System.out.println("Ingrese el numero del ejemplar: ");
-            int nro = Integer.parseInt(teclado.nextLine());
-
-            System.out.println("Ingrese la fecha del prestamo (dd-mm-yyyy): ");
-            LocalDate fechaP = LocalDate.parse(teclado.nextLine(), formato);
-
-            System.out.println("Ingrese la fecha limite del prestamo (dd-mm-yyyy): ");
-            LocalDate fechaPrev = LocalDate.parse(teclado.nextLine(), formato);
-
-            gestor.registrarPrestamo(id, isbn, nro, fechaP, fechaPrev);
-
-        } catch (NumberFormatException e) {
-            System.out.println("Error: debe ingresar un numero entero.");
-        } catch (DateTimeParseException e) {
-            System.out.println("Error: fecha invalida. Use el formato dd-mm-yyyy.");
+        } catch (SQLException e) {
+            System.out.println("Error de base de datos al registrar prestamo: " + e.getMessage());
         }
     }
 
-    private void pedirYRegistrarDevolucion() {
-        try {
-            System.out.println("Ingrese el ID del prestamo: ");
-            int id = Integer.parseInt(teclado.nextLine());
+    public void registrarDevolucion(int idPrestamo, LocalDate fechaDev) {
 
-            System.out.println("Ingrese la fecha de devolucion (dd-mm-yyyy): ");
-            LocalDate fechaDev = LocalDate.parse(teclado.nextLine(), formato);
+        //Datos
+        String sqlDatos
+                = "SELECT fecha_devolucion_real, ISBN, nro_ejemplar FROM PRESTAMO \n"
+                + "WHERE id_prestamo = ?";
 
-            gestor.registrarDevolucion(id, fechaDev);
+        //Actualizar
+        String sqlActualizarPrestamo
+                = "UPDATE PRESTAMO SET fecha_devolucion_real = ? \n"
+                + "WHERE id_prestamo = ?";
+        String sqlActualizarEjemplar
+                = "UPDATE EJEMPLAR SET estado = ? \n"
+                + "WHERE ISBN = ? AND nro_ejemplar = ?";
 
-        } catch (NumberFormatException e) {
-            System.out.println("Error: el ID debe ser un numero entero.");
-        } catch (DateTimeParseException e) {
-            System.out.println("Error: fecha invalida. Use el formato dd-mm-yyyy.");
+        try (Connection con = Conexion.getConexion()) {
+            String isbn;
+            int nro;
+            boolean sePuedeSeguir = true;
+
+            // buscar el préstamo 
+            try (PreparedStatement instruccionBusquedaDeDatos = con.prepareStatement(sqlDatos)) {
+                instruccionBusquedaDeDatos.setInt(1, idPrestamo);
+
+                // verificar que no esté devuelto
+                try (ResultSet consultaDatos = instruccionBusquedaDeDatos.executeQuery()) {
+                    if (!consultaDatos.next()) {
+                        System.out.println("Error: ID de préstamo no encontrado.");
+                        sePuedeSeguir = false;
+                    }
+                    if (consultaDatos.getDate("fecha_devolucion_real") != null && sePuedeSeguir) {
+                        System.out.println("Aviso: Este prestamo ya fue devuelto previamente.");
+                        sePuedeSeguir = false;
+                    }
+
+                    isbn = consultaDatos.getString("ISBN");
+                    nro = consultaDatos.getInt("nro_ejemplar");
+                }
+            }
+
+            if (sePuedeSeguir) {
+                // Actualizar Datos
+                try (PreparedStatement instruccionActualizarPrestamos = con.prepareStatement(sqlActualizarPrestamo); PreparedStatement instruccionActualizarEjemplar = con.prepareStatement(sqlActualizarEjemplar)) {
+                    instruccionActualizarPrestamos.setDate(1, java.sql.Date.valueOf(fechaDev));
+                    instruccionActualizarPrestamos.setInt(2, idPrestamo);
+                    instruccionActualizarEjemplar.setString(1, Estado.Disponible.name());
+                    instruccionActualizarEjemplar.setString(2, isbn);
+                    instruccionActualizarEjemplar.setInt(3, nro);
+
+                    // Ejecutamos
+                    instruccionActualizarPrestamos.executeUpdate();
+                    instruccionActualizarEjemplar.executeUpdate();
+
+                    System.out.println("¡Devolucion exitosa! El ejemplar vuelve a estar disponible.");
+                }
+
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error de base de datos al modificar prestamo: " + e.getMessage());
+        }
+    }
+
+    public void listarPrestamos() {
+
+        String sql
+                = "SELECT p.id_prestamo, s.nombre, l.titulo, p.fecha_prestamo "
+                + "FROM PRESTAMO p "
+                + "JOIN SOCIO s ON p.id_socio = s.id_socio "
+                + "JOIN LIBRO l ON p.ISBN = l.ISBN";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql); ResultSet consulta = instruccion.executeQuery()) {
+
+            System.out.printf(
+                    "%-8s %-25s %-35s %-15s%n",
+                    "ID", "SOCIO", "LIBRO", "FECHA");
+            System.out.println("-------------------------------------------------------------------------------------");
+
+            while (consulta.next()) {
+                int idP = consulta.getInt("id_prestamo");
+                String nom = consulta.getString("nombre");
+                String titu = consulta.getString("titulo");
+                LocalDate fechaP = consulta.getDate("fecha_prestamo").toLocalDate();
+
+                System.out.printf(
+                        "%-8d %-25s %-35s %-15s%n",
+                        idP, nom, titu, fechaP);
+            }
+            System.out.println();
+
+        } catch (SQLException e) {
+            System.out.println("Error al listar prestamos: " + e.getMessage());
         }
     }
 }

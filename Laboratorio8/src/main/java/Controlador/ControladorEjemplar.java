@@ -1,98 +1,86 @@
 package Controlador;
 
-import Gestor.GestorEjemplar;
-import herramientas.ControladorMenu;
-import herramientas.Estado;
-import herramientas.Mensaje;
-import herramientas.Pausa;
-import java.util.Scanner;
+import herramientas.Conexion;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class ControladorEjemplar implements ControladorMenu {
+public class ControladorEjemplar {
 
-    private GestorEjemplar gestor = new GestorEjemplar();
-    private Scanner teclado = new Scanner(System.in);
+    public void agregarEjemplar(String isbn, int nro, String estado) {
+        String sql
+                = "INSERT INTO EJEMPLAR (ISBN, nro_ejemplar, estado) \n"
+                + "VALUES (?, ?, ?)";
 
-    @Override
-    public void ejecutarMenu() {
-        int menu = -1;
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
 
-        do {
-            try {
-                System.out.print(
-                        "\n=== Ejemplar Menú ===\n"
-                        + "1. Agregar ejemplar\n"
-                        + "2. Listar ejemplares de un libro\n"
-                        + "3. Modificar estado\n"
-                        + "0. Salir\n"
-                        + "Opcion: ");
+            instruccion.setString(1, isbn);
+            instruccion.setInt(2, nro);
+            instruccion.setString(3, estado);
 
-                String entrada = teclado.nextLine();
-                menu = Integer.parseInt(entrada);
+            instruccion.executeUpdate();
+            System.out.println("Ejemplar agregado correctamente");
 
-                switch (menu) {
-                    case 1 ->
-                        pedirYAgregarEjemplar();
-                    case 2 ->
-                        pedirYListarEjemplares();
-                    case 3 ->
-                        pedirYModificarEstado();
-                    case 0 ->
-                        System.out.println("<--\n\n");
-                    default ->
-                        Mensaje.opcionInvalida();
+        } catch (SQLException e) {
+            System.out.println("Error al agregar ejemplar: " + e.getMessage());
+        }
+    }
+
+    public void listarEjemplares(String ISBN) {
+        String sql
+                = "SELECT * FROM EJEMPLAR \n"
+                + "WHERE ISBN = ? ";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+            instruccion.setString(1, ISBN);
+
+            try (ResultSet consulta = instruccion.executeQuery()) {
+                System.out.printf(
+                        "%-15s %-20s%n",
+                        "N° EJEMPLAR", "ESTADO");
+                System.out.println("-----------------------------------");
+
+                while (consulta.next()) {
+                    int nro_ejemplar = consulta.getInt("nro_ejemplar");
+                    String estado = consulta.getString("estado");
+
+                    System.out.printf(
+                            "%-15d %-20s%n",
+                            nro_ejemplar, estado);
                 }
-
-            } catch (NumberFormatException e) {
-                Mensaje.tipoDatoIncorrecto();
+                System.out.println();
             }
 
-            if (menu != 0) {
-                Pausa.pausar();
+        } catch (SQLException e) {
+            System.out.println("Error al listar los ejemplares: " + e.getMessage());
+        }
+    }
+
+    public void modificarEstado(String isbn, int nro, String estado) {
+
+        String sql
+                = "UPDATE EJEMPLAR SET estado = ?"
+                + "WHERE ISBN = ? AND nro_ejemplar = ?";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+
+            instruccion.setString(1, estado);
+            instruccion.setString(2, isbn);
+            instruccion.setInt(3, nro);
+
+            int filas = instruccion.executeUpdate();
+
+            if (filas > 0) {
+                System.out.println("Estado actualizado");
+            } else {
+                System.out.println("No se pudo cambiar: el ejemplar no existe o no estaba ");
             }
-        } while (menu != 0);
-    }
 
-    private void pedirYAgregarEjemplar() {
-        System.out.println("Ingres ISBN: ");
-        String isbn = teclado.nextLine();
-        System.out.println("Ingrese nro de ejemplar: ");
-        int nro = Integer.parseInt(teclado.nextLine());
-        System.out.println("Que estado quiere darle al ejemplar [1:Disponible|2:Prestado]: ");
-        int estado = Integer.parseInt(teclado.nextLine());
-        if (estado == 1) {
-            gestor.agregarEjemplar(isbn, nro, Estado.Disponible.name());
-        } else {
-
-            gestor.agregarEjemplar(isbn, nro, Estado.Prestado.name());
-        }
-    }
-
-    private void pedirYModificarEstado() {
-        System.out.println("Ingrese el ISBN del Ejemplar a Buscar:");
-        String isbn = teclado.nextLine();
-        System.out.println("Ingrese nro de ejemplar: ");
-        int nro = Integer.parseInt(teclado.nextLine());
-        System.out.println("Que estado quiere darle al ejemplar [1:Disponible|2:Prestado]: ");
-        int estado = Integer.parseInt(teclado.nextLine());
-
-        if (estado == 1) {
-            gestor.modificarEstado(isbn, nro, Estado.Disponible.name());
-        } else {
-
-            gestor.modificarEstado(isbn, nro, Estado.Prestado.name());
-        }
-    }
-
-    private void pedirYListarEjemplares() {
-        String ISBN = null;
-
-        System.out.println("Ingrese el ISBN del libro buscado: ");
-        ISBN = teclado.nextLine();
-        if (ISBN == null || ISBN.isEmpty()) {
-            throw new IllegalArgumentException("El ISBN no puede estar vacío.");
+        } catch (SQLException e) {
+            System.out.println("Error al modificar el estado: " + e.getMessage());
         }
 
-        gestor.listarEjemplares(ISBN);
     }
 
 }

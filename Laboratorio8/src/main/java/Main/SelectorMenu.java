@@ -1,15 +1,15 @@
 package Main;
 
-import Controlador.ControladorEjemplar;
-import Controlador.ControladorLibro;
-import Controlador.ControladorPrestamo;
-import Controlador.ControladorSocio;
-import herramientas.ControladorMenu;
+import Gestor.GestorEjemplar;
+import Gestor.GestorLibro;
+import Gestor.GestorPrestamo;
+import Gestor.GestorSocio;
 import herramientas.Mensaje;
 import herramientas.Pausa;
 import java.util.Scanner;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import herramientas.GestorMenu;
 
 public class SelectorMenu {
 
@@ -18,16 +18,16 @@ public class SelectorMenu {
     public void seleccionar() {
 
         //Controladores creados para no tener que hacer New en cada vuelta que da el do while
-        ControladorLibro menuLibro = new ControladorLibro();
-        ControladorSocio menuSocio = new ControladorSocio();
-        ControladorEjemplar menuEjemplar = new ControladorEjemplar();
-        ControladorPrestamo menuPrestamo = new ControladorPrestamo();
+        GestorLibro menuLibro = new GestorLibro();
+        GestorSocio menuSocio = new GestorSocio();
+        GestorEjemplar menuEjemplar = new GestorEjemplar();
+        GestorPrestamo menuPrestamo = new GestorPrestamo();
 
         // Forzar la consola a UTF-8 para que los acentos salgan bien en consola, recomendado por Gemini
         System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
 
         //seleccion
-        ControladorMenu seleccion = null;
+        GestorMenu seleccion = null;
         int menu = -1;
 
         do {

@@ -1,6 +1,6 @@
 package herramientas;
 
-public interface ControladorMenu {
+public interface GestorMenu {
 
     void ejecutarMenu();
 }

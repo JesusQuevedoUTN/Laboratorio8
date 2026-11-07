@@ -1,99 +1,123 @@
 package Controlador;
 
-import Gestor.GestorLibro;
-import herramientas.ControladorMenu;
-import herramientas.Mensaje;
-import herramientas.Pausa;
-import java.util.Scanner;
+import herramientas.Conexion;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class ControladorLibro implements ControladorMenu {
+public class ControladorLibro {
 
-    private GestorLibro gestor = new GestorLibro();
-    private Scanner teclado = new Scanner(System.in);
+    public void agregarLibro(String isbn, String titulo, String autor, String editorial, int anio) {
+        String sql
+                = "INSERT INTO LIBRO (ISBN, titulo, autor, editorial, anio_publicacion) \n"
+                + "VALUES (?, ?, ?, ?, ?)";
 
-    @Override
-    public void ejecutarMenu() {
-        int menu = -1;
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+            instruccion.setString(1, isbn);
+            instruccion.setString(2, titulo);
+            instruccion.setString(3, autor);
+            instruccion.setString(4, editorial);
+            instruccion.setInt(5, anio);
 
-        do {
-            try {
-                System.out.print(
-                        "\n=== Libro Menú ===\n"
-                        + "1. Agregar libro\n"
-                        + "2. Listar libros\n"
-                        + "3. Buscar libro\n"
-                        + "4. Modificar libro\n"
-                        + "5. Eliminar libro\n"
-                        + "0. Salir\n"
-                        + "Opcion: ");
+            instruccion.executeUpdate();
+            System.out.println("Libro agregado correctamente");
 
-                menu = Integer.parseInt(teclado.nextLine());
+        } catch (SQLException e) {
+            System.out.println("Error al agregar el libro: " + e.getMessage());
+        }
+    }
 
-                switch (menu) {
-                    case 1 ->
-                        pedirYAgregarLibro();
-                    case 2 ->
-                        gestor.listarLibros();
-                    case 3 ->
-                        pedirYBuscarLibro();
-                    case 4 ->
-                        pedirYModificarLibro();
-                    case 5 ->
-                        pedirYEliminarLibro();
-                    case 0 ->
-                        System.out.println("<--\n\n");
-                    default ->
-                        Mensaje.opcionInvalida();
+    public void listarLibros() {
+        String sql
+                = "SELECT ISBN, titulo, autor, editorial, anio_publicacion\n"
+                + "FROM LIBRO\n"
+                + "ORDER BY ISBN ASC;";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql); ResultSet consulta = instruccion.executeQuery()) {
+            System.out.printf(
+                    "%-20s %-30s %-25s %-25s %-10s%n",
+                    "ISBN", "TÍTULO", "AUTOR", "EDITORIAL", "AÑO");
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
+
+            while (consulta.next()) {
+                String isbn = consulta.getString("ISBN");
+                String titulo = consulta.getString("titulo");
+                String autor = consulta.getString("autor");
+                String editorial = consulta.getString("editorial");
+                int anio = consulta.getInt("anio_publicacion");
+
+                System.out.printf(
+                        "%-20s %-30s %-25s %-25s %-10d%n",
+                        isbn, titulo, autor, editorial, anio);
+            }
+            System.out.println();
+        } catch (SQLException e) {
+            System.out.println("Error al listar libros: " + e.getMessage());
+        }
+    }
+
+    public void buscarLibroPorISBN(String isbn) {
+        String sql = "SELECT * FROM LIBRO WHERE ISBN = ?";
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+            instruccion.setString(1, isbn);
+            try (ResultSet rs = instruccion.executeQuery()) {
+                if (rs.next()) {
+                    System.out.println("\n--- Libro Encontrado ---");
+                    System.out.println("ISBN: " + isbn);
+                    System.out.println("Titulo: " + rs.getString("titulo"));
+                    System.out.println("Autor: " + rs.getString("autor"));
+                    System.out.println("Editorial: " + rs.getString("editorial"));
+                    System.out.println("Anio de publicacion: " + rs.getInt("anio_publicacion"));
+                    System.out.println("--------------------------\n");
+                } else {
+                    System.out.println("Libro no encontrado");
                 }
-            } catch (NumberFormatException e) {
-                Mensaje.tipoDatoIncorrecto();
             }
+        } catch (SQLException e) {
+            System.out.println("Error al buscar libro: " + e.getMessage());
+        }
+    }
 
-            if (menu != 0) {
-                Pausa.pausar();
+    public void modificarLibro(String isbn, String titulo, String autor, String editorial, int anio) {
+        String sql
+                = "UPDATE LIBRO SET titulo = ?, autor = ?, editorial = ?, anio_publicacion = ? \n"
+                + "WHERE ISBN = ?";
+
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+            instruccion.setString(1, titulo);
+            instruccion.setString(2, autor);
+            instruccion.setString(3, editorial);
+            instruccion.setInt(4, anio);
+            instruccion.setString(5, isbn);
+
+            int filas = instruccion.executeUpdate();
+            if (filas > 0) {
+                System.out.println("Libro modificado correctamente");
+            } else {
+                System.out.println("No existe un libro con ese ISBN");
             }
-        } while (menu != 0);
+        } catch (SQLException e) {
+            System.out.println("Error al modificar libro: " + e.getMessage());
+        }
     }
 
-    private void pedirYAgregarLibro() {
-        System.out.println("Ingrese ISBN: ");
-        String isbn = teclado.nextLine();
-        System.out.println("Ingrese titulo: ");
-        String titulo = teclado.nextLine();
-        System.out.println("Ingrese autor: ");
-        String autor = teclado.nextLine();
-        System.out.println("Ingrese editorial: ");
-        String editorial = teclado.nextLine();
-        System.out.println("Ingrese anio de publicacion: ");
-        int anio = Integer.parseInt(teclado.nextLine());
+    public void eliminarLibro(String isbn) {
+        String sql
+                = "DELETE FROM LIBRO \n"
+                + "WHERE ISBN = ?";
 
-        gestor.agregarLibro(isbn, titulo, autor, editorial, anio);
+        try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {
+            instruccion.setString(1, isbn);
+            int filas = instruccion.executeUpdate();
+            if (filas > 0) {
+                System.out.println("Libro eliminado correctamente.");
+            } else {
+                System.out.println("No existe un libro con ese ISBN.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al eliminar libro: " + e.getMessage());
+        }
     }
 
-    private void pedirYBuscarLibro() {
-        System.out.println("Ingrese el ISBN a buscar: ");
-        String isbn = teclado.nextLine();
-        gestor.buscarLibroPorISBN(isbn);
-    }
-
-    private void pedirYModificarLibro() {
-        System.out.println("Ingrese el ISBN a modificar: ");
-        String isbn = teclado.nextLine();
-        System.out.println("Ingrese nuevo titulo: ");
-        String titulo = teclado.nextLine();
-        System.out.println("Ingrese nuevo autor: ");
-        String autor = teclado.nextLine();
-        System.out.println("Ingrese nueva editorial: ");
-        String editorial = teclado.nextLine();
-        System.out.println("Ingrese nuevo anio: ");
-        int anio = Integer.parseInt(teclado.nextLine());
-
-        gestor.modificarLibro(isbn, titulo, autor, editorial, anio);
-    }
-
-    private void pedirYEliminarLibro() {
-        System.out.println("Ingrese el ISBN a eliminar: ");
-        String isbn = teclado.nextLine();
-        gestor.eliminarLibro(isbn);
-    }
 }
