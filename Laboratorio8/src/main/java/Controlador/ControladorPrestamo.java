@@ -10,13 +10,13 @@ import java.time.LocalDate;
 
 public class ControladorPrestamo {
 
-    public void registrarPrestamo(int idSocio, String isbn, int nroEjemplar, LocalDate fechaP, LocalDate fechaPrev) {
+    public void registrarPrestamo(int idSocio, String isbn, int nroEjemplar, LocalDate fechaPrestamo, LocalDate fechaLimite) {
 
         boolean sePuedeSeguir = true;
 
         //Conectar
         try (Connection con = Conexion.getConexion()) {
-            
+
             // Buscar Socio
             String sqlSocio = "SELECT id_socio FROM SOCIO WHERE id_socio = ?";
             try (PreparedStatement buscarSocio = con.prepareStatement(sqlSocio)) {
@@ -64,25 +64,42 @@ public class ControladorPrestamo {
                         }
                     }
 
+                    
                     if (sePuedeSeguir) {
-                        //Esta todo bien, registrar Préstamo 
+                        // Esta todo bien, registrar Préstamo
                         String sqlPrestamo = "INSERT INTO PRESTAMO (id_socio, ISBN, nro_ejemplar, fecha_prestamo, fecha_devolucion_prevista) VALUES (?, ?, ?, ?, ?)";
                         String sqlActualizar = "UPDATE EJEMPLAR SET estado = 'Prestado' WHERE ISBN = ? AND nro_ejemplar = ?";
+
+                        // Se desactiva el commit automático para que si falla un paso, no lo registre
+                        con.setAutoCommit(false);
+
                         try (PreparedStatement registrarPrestamo = con.prepareStatement(sqlPrestamo); PreparedStatement actualizarEjemplar = con.prepareStatement(sqlActualizar)) {
 
                             registrarPrestamo.setInt(1, idSocio);
                             registrarPrestamo.setString(2, isbn);
                             registrarPrestamo.setInt(3, nroEjemplar);
-                            registrarPrestamo.setDate(4, java.sql.Date.valueOf(fechaP));
-                            registrarPrestamo.setDate(5, java.sql.Date.valueOf(fechaPrev));
+                            registrarPrestamo.setDate(4, java.sql.Date.valueOf(fechaPrestamo));
+                            registrarPrestamo.setDate(5, java.sql.Date.valueOf(fechaLimite));
 
                             actualizarEjemplar.setString(1, isbn);
                             actualizarEjemplar.setInt(2, nroEjemplar);
 
-                            registrarPrestamo.executeUpdate();
-                            actualizarEjemplar.executeUpdate();
+                            int filasPrestamo = registrarPrestamo.executeUpdate();
+                            int filasEjemplar = actualizarEjemplar.executeUpdate();
 
-                            System.out.println("¡Prestamo registrado con éxito!");
+                            if (filasPrestamo == 1 && filasEjemplar == 1) {
+                                // Confirmar ambas operaciones y se manda la instrucción
+                                con.commit();
+                                System.out.println("¡Prestamo registrado con éxito!");
+                            } else {
+                                // Con rollback le decimos que no haga el commit
+                                con.rollback();
+                                System.out.println("Error: No se pudo completar el préstamo.");
+                            }
+
+                        } catch (SQLException e) {
+                            con.rollback();
+                            throw e;
                         }
                     }
                 }
@@ -109,11 +126,11 @@ public class ControladorPrestamo {
                 + "WHERE ISBN = ? AND nro_ejemplar = ?";
 
         try (Connection con = Conexion.getConexion()) {
-            String isbn;
-            int nro;
+            String isbn = null;
+            int nro = -1;
             boolean sePuedeSeguir = true;
 
-            // buscar el préstamo 
+            // buscar el préstamo
             try (PreparedStatement instruccionBusquedaDeDatos = con.prepareStatement(sqlDatos)) {
                 instruccionBusquedaDeDatos.setInt(1, idPrestamo);
 
@@ -123,32 +140,51 @@ public class ControladorPrestamo {
                         System.out.println("Error: ID de préstamo no encontrado.");
                         sePuedeSeguir = false;
                     }
-                    if (consultaDatos.getDate("fecha_devolucion_real") != null && sePuedeSeguir) {
+                    if (sePuedeSeguir && consultaDatos.getDate("fecha_devolucion_real") != null) {
                         System.out.println("Aviso: Este prestamo ya fue devuelto previamente.");
                         sePuedeSeguir = false;
                     }
 
-                    isbn = consultaDatos.getString("ISBN");
-                    nro = consultaDatos.getInt("nro_ejemplar");
+                    if (sePuedeSeguir) {
+                        isbn = consultaDatos.getString("ISBN");
+                        nro = consultaDatos.getInt("nro_ejemplar");
+                    }
+
                 }
+
             }
 
             if (sePuedeSeguir) {
-                // Actualizar Datos
+
+                // Desactivar el commit automático
+                con.setAutoCommit(false);
+
                 try (PreparedStatement instruccionActualizarPrestamos = con.prepareStatement(sqlActualizarPrestamo); PreparedStatement instruccionActualizarEjemplar = con.prepareStatement(sqlActualizarEjemplar)) {
+
                     instruccionActualizarPrestamos.setDate(1, java.sql.Date.valueOf(fechaDev));
                     instruccionActualizarPrestamos.setInt(2, idPrestamo);
+
                     instruccionActualizarEjemplar.setString(1, Estado.Disponible.name());
                     instruccionActualizarEjemplar.setString(2, isbn);
                     instruccionActualizarEjemplar.setInt(3, nro);
 
                     // Ejecutamos
-                    instruccionActualizarPrestamos.executeUpdate();
-                    instruccionActualizarEjemplar.executeUpdate();
+                    int filasPrestamo = instruccionActualizarPrestamos.executeUpdate();
+                    int filasEjemplar = instruccionActualizarEjemplar.executeUpdate();
 
-                    System.out.println("¡Devolucion exitosa! El ejemplar vuelve a estar disponible.");
+                    if (filasPrestamo == 1 && filasEjemplar == 1) {
+                        // Confirmar que ambas operaciones hayan sido un éxito
+                        con.commit();
+                        System.out.println("¡Devolucion exitosa! El ejemplar vuelve a estar disponible.");
+                    } else {
+                        // si no se borra
+                        con.rollback();
+                        System.out.println("Error: No se pudo completar la devolución.");
+                    }
+                } catch (SQLException e) {
+                    con.rollback();
+                    throw e;
                 }
-
             }
 
         } catch (SQLException e) {
