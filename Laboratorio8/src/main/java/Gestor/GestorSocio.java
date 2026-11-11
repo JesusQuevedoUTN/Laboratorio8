@@ -98,8 +98,11 @@ public class GestorSocio implements GestorMenu {
         String nuevoNombre = teclado.nextLine();
         System.out.print("Ingrese el nuevo teléfono: ");
         String nuevoTelefono = teclado.nextLine();
-
-        gestor.modificarSocio(dniModificar, nuevoNombre, nuevoTelefono);
+        if (nuevoNombre.isBlank() || dniModificar.isBlank() || nuevoTelefono.isBlank()) {
+            System.out.println("Error: Los campos no pueden estar vacíos.");
+        } else {
+            gestor.modificarSocio(dniModificar, nuevoNombre, nuevoTelefono);
+        }
     }
 
     private void pedirYEliminarSocio() {

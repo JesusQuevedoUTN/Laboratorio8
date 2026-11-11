@@ -10,7 +10,7 @@ public class Conexion {
     private static final String URL = "jdbc:mariadb://localhost:3306/biblioteca_db";
     private static final String PARAMETROS = "?allowPublicKeyRetrieval=true";
     private static final String USUARIO = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "1234";
 
     public static Connection getConexion() {
         Connection conexion = null;

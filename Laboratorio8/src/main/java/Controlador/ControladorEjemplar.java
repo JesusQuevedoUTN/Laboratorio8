@@ -36,18 +36,27 @@ public class ControladorEjemplar {
             instruccion.setString(1, ISBN);
 
             try (ResultSet consulta = instruccion.executeQuery()) {
+                if (consulta.next()) {
                 System.out.printf(
                         "%-15s %-20s%n",
                         "N° EJEMPLAR", "ESTADO");
-                System.out.println("-----------------------------------");
+                int nro_ejemplar = consulta.getInt("nro_ejemplar");
+                        String estado = consulta.getString("estado");
 
-                while (consulta.next()) {
-                    int nro_ejemplar = consulta.getInt("nro_ejemplar");
-                    String estado = consulta.getString("estado");
+                System.out.println("-----------------------------------"); 
+                        System.out.printf(
+                                "%-15d %-20s%n",
+                                nro_ejemplar, estado);              
+                    while (consulta.next()) {
+                        nro_ejemplar = consulta.getInt("nro_ejemplar");
+                        estado = consulta.getString("estado");
 
-                    System.out.printf(
-                            "%-15d %-20s%n",
-                            nro_ejemplar, estado);
+                        System.out.printf(
+                                "%-15d %-20s%n",
+                                nro_ejemplar, estado);
+                    }
+                } else {
+                    System.out.println("Libro no encontrado\n");
                 }
                 System.out.println();
             }
@@ -60,7 +69,7 @@ public class ControladorEjemplar {
     public void modificarEstado(String isbn, int nro, String estado) {
 
         String sql
-                = "UPDATE EJEMPLAR SET estado = ?"
+                = "UPDATE EJEMPLAR SET estado = ? "
                 + "WHERE ISBN = ? AND nro_ejemplar = ?";
 
         try (Connection con = Conexion.getConexion(); PreparedStatement instruccion = con.prepareStatement(sql)) {

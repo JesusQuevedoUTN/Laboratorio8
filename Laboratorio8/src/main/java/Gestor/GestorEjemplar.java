@@ -85,9 +85,9 @@ public class GestorEjemplar implements GestorMenu {
         int estado = Integer.parseInt(teclado.nextLine());
         switch (estado) {
             case 1 ->
-                gestor.agregarEjemplar(isbn, nro, Estado.Disponible.name());
+                gestor.modificarEstado(isbn, nro, Estado.Disponible.name());
             case 2 ->
-                gestor.agregarEjemplar(isbn, nro, Estado.Prestado.name());
+                gestor.modificarEstado(isbn, nro, Estado.Prestado.name());
             default ->
                 System.out.println("Error: Estado inválido.");
         }
