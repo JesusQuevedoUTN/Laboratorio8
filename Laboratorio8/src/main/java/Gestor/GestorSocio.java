@@ -74,7 +74,7 @@ public class GestorSocio implements GestorMenu {
             if (nombre.isBlank() || dni.isBlank() || tel.isBlank()) {
                 System.out.println("Error: Los campos no pueden estar vacíos.");
             } else {
-                System.out.print("Ingrese fecha de alta (dia-mes-año): ");
+                System.out.print("Ingrese fecha de alta (año-mes-día): ");
                 LocalDate fecha = LocalDate.parse(teclado.nextLine(), formato);
 
                 gestor.agregarSocio(nombre, dni, tel, fecha);
