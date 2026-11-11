@@ -13,7 +13,7 @@ public class GestorPrestamo implements GestorMenu {
 
     private ControladorPrestamo gestor = new ControladorPrestamo();
     private Scanner teclado = new Scanner(System.in);
-    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("d-M-yyyy");
+    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-M-d");
 
     @Override
     public void ejecutarMenu() {

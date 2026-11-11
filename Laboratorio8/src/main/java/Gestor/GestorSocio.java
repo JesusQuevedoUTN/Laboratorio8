@@ -13,7 +13,7 @@ public class GestorSocio implements GestorMenu {
 
     private ControladorSocio gestor = new ControladorSocio();
     private Scanner teclado = new Scanner(System.in);
-    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("d-M-yyyy");
+    private DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-M-d");
 
     @Override
     public void ejecutarMenu() {
@@ -105,8 +105,8 @@ public class GestorSocio implements GestorMenu {
     private void pedirYEliminarSocio() {
         System.out.print("Ingrese el ID del socio a eliminar: ");
         try {
-            int dniEliminar = Integer.parseInt(teclado.nextLine());
-            gestor.eliminarSocio(dniEliminar);
+            int idEliminar = Integer.parseInt(teclado.nextLine());
+            gestor.eliminarSocio(idEliminar);
         } catch (NumberFormatException e) {
             System.out.println("Error: El ID debe ser un número entero.");
         }

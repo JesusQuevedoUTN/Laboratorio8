@@ -119,31 +119,27 @@ public class GestorLibro implements GestorMenu {
                 System.out.println("Error: Año de publicación inválido.");
             } else {
                 gestor.modificarLibro(isbn, titulo, autor, editorial, anio);
-
             }
-
         }
-
     }
 
     private void pedirYEliminarLibro() {
         System.out.println("Ingrese el ISBN a eliminar: ");
         String isbn = teclado.nextLine();
         int respuesta = 0;
-        
+
         String titulo = gestor.buscarTitulo(isbn);
-        
-        if(titulo != null){
-        System.out.println("Estas seguro de que queres borrar el libro: " + titulo + " ? [1 para SI || otro numero para NO]");
-        respuesta = Integer.parseInt(teclado.nextLine());
-        if (respuesta == 1) {
-            gestor.eliminarLibro(isbn);
-            
-        }else{
-            System.out.println("No se borro: " + titulo);
-        }
-        
+
+        if (titulo != null) {
+            System.out.println("Estas seguro de que queres borrar el libro: " + titulo + " ? [1 para SI || otro numero para NO]");
+            respuesta = Integer.parseInt(teclado.nextLine());
+            if (respuesta == 1) {
+                gestor.eliminarLibro(isbn);
+
+            } else {
+                System.out.println("No se borro: " + titulo);
+            }
+
         }
     }
 }
-

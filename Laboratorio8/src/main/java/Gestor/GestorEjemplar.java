@@ -79,10 +79,9 @@ public class GestorEjemplar implements GestorMenu {
         String isbn = teclado.nextLine();
         
         System.out.println("Ingrese nro de ejemplar: ");
-        
         int nro = Integer.parseInt(teclado.nextLine());
-        System.out.println("Que estado quiere darle al ejemplar [1:Disponible|2:Prestado]: ");
         
+        System.out.println("Que estado quiere darle al ejemplar [1:Disponible|2:Prestado]: ");
         int estado = Integer.parseInt(teclado.nextLine());
         switch (estado) {
             case 1 ->
